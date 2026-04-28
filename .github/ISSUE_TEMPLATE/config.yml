@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📋 開發企劃書
+    url: ../docs/團報多營隊報名系統改善企劃書.md
+    about: 系統設計、實作紀錄、IML 隱藏 syntax 知識

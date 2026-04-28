@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>太陽實驗室 — 團報報名流程</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+      background: #F4F6FA;
+      padding: 40px 24px 60px;
+      color: #1E2340;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .page-title h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E2340;
+      letter-spacing: 0.5px;
+    }
+    .page-title p {
+      font-size: 13px;
+      color: #7B83A0;
+      margin-top: 4px;
+    }
+
+    /* ── Layout ── */
+    .diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      max-width: 720px;
+      margin: 36px auto 0;
+    }
+
+    /* ── Swim-lane headers ── */
+    .lane-label {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-radius: 12px 12px 0 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    .lane-label.parent  { background: #E8F4FF; color: #2B7FD9; border: 1.5px solid #BDD9F5; border-bottom: none; }
+    .lane-label.backend { background: #EDF5EC; color: #2A8A4A; border: 1.5px solid #B8DEBB; border-bottom: none; }
+
+    .lane-body {
+      width: 100%;
+      padding: 24px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .lane-body.parent  { background: #F5FAFF; border: 1.5px solid #BDD9F5; border-top: none; border-radius: 0 0 0 0; }
+    .lane-body.backend { background: #F4FBF3; border: 1.5px solid #B8DEBB; border-top: none; border-radius: 0 0 12px 12px; }
+
+    /* ── Nodes ── */
+    .node {
+      border-radius: 12px;
+      padding: 12px 20px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.5;
+      min-width: 220px;
+      max-width: 340px;
+      width: 100%;
+      position: relative;
+    }
+    .node .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+    .node .label { font-weight: 600; display: block; }
+    .node .sub   { font-size: 12px; color: #7B83A0; margin-top: 2px; display: block; }
+
+    .node-blue  { background: #EBF4FF; border: 1.5px solid #93C4F0; color: #1D5FA8; }
+    .node-indigo{ background: #EEF0FF; border: 1.5px solid #A4ABEE; color: #3A42A8; }
+    .node-pay   { background: #FFF8EB; border: 1.5px solid #F0C070; color: #8A5A00; }
+    .node-green { background: #EBF7F0; border: 1.5px solid #7EC99A; color: #1A6B3A; }
+    .node-purple{ background: #F5EEFF; border: 1.5px solid #B8A0EE; color: #5430A8; }
+    .node-hubspot{ background: #FFF3EB; border: 1.5px solid #F0A070; color: #8A3D00; }
+
+    /* ── Arrows ── */
+    .arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 4px 0;
+    }
+    .arrow-line { width: 2px; height: 22px; background: #B0B8D0; }
+    .arrow-head {
+      width: 0; height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 9px solid #B0B8D0;
+    }
+    .arrow-label {
+      font-size: 11px;
+      color: #7B83A0;
+      background: #F4F6FA;
+      padding: 1px 8px;
+      border-radius: 8px;
+      margin-bottom: 2px;
+      border: 1px solid #DDE2EE;
+    }
+
+    /* ── Branch (camp selection) ── */
+    .branch-wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .decision {
+      background: #FFF5E6;
+      border: 1.5px solid #F0B060;
+      color: #7A4500;
+      border-radius: 50%;
+      width: 110px; height: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.35;
+    }
+    .decision .icon { font-size: 22px; margin-bottom: 2px; }
+
+    .branches {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      margin-top: 6px;
+    }
+    .branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      max-width: 190px;
+    }
+    .branch-tag {
+      font-size: 11px;
+      background: #F0F0FF;
+      border: 1px solid #C0C8F0;
+      color: #444A88;
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-weight: 600;
+    }
+    .branch-line-v { width: 2px; height: 16px; background: #B0B8D0; }
+    .branch-node {
+      background: #EBF4FF;
+      border: 1.5px solid #93C4F0;
+      color: #1D5FA8;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      width: 100%;
+    }
+    .branch-converge {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      width: 100%;
+      gap: 0;
+      margin-top: 4px;
+    }
+    .converge-line-h {
+      height: 2px;
+      background: #B0B8D0;
+      flex: 1;
+    }
+    .converge-line-v { width: 2px; height: 20px; background: #B0B8D0; }
+    .converge-mid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .converge-dot {
+      width: 8px; height: 8px;
+      background: #B0B8D0;
+      border-radius: 50%;
+    }
+
+    /* ── Parallel (post-payment) ── */
+    .parallel {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+    }
+    .parallel-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      flex: 1;
+      max-width: 260px;
+    }
+    .parallel-line-v { width: 2px; height: 24px; background: #B0B8D0; }
+
+    /* ── Divider between lanes ── */
+    .lane-divider {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 0;
+      background: linear-gradient(to bottom, #F5FAFF, #F4FBF3);
+      border-left: 1.5px solid #BDD9F5;
+      border-right: 1.5px solid #B8DEBB;
+    }
+    .webhook-label {
+      font-size: 11px;
+      background: #FFFBEC;
+      border: 1px solid #E8C860;
+      color: #7A5500;
+      border-radius: 8px;
+      padding: 2px 12px;
+      font-weight: 600;
+      margin: 3px 0;
+    }
+
+    /* ── Tool badges ── */
+    .tool-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 40px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tool-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1.5px solid #DDE2EE;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #3A4060;
+    }
+    .tool-badge .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-blue   { background: #3A8EDF; }
+    .dot-orange { background: #F07030; }
+    .dot-green  { background: #30A060; }
+    .dot-pay    { background: #E09820; }
+    .dot-purple { background: #7A50D0; }
+  </style>
+</head>
+<body>
+
+  <div class="page-title">
+    <h1>☀️ 太陽實驗室 — 團報報名新流程</h1>
+    <p>家長填表 → 選營隊 → 付款 → 自動寄出契約書 &amp; 同步 HubSpot</p>
+  </div>
+
+  <div class="diagram">
+
+    <!-- ══ 家長端 ══ -->
+    <div class="lane-label parent">
+      <span>📱</span> 家長操作
+    </div>
+    <div class="lane-body parent">
+
+      <!-- 1. LINE -->
+      <div class="node node-blue">
+        <span class="icon">💬</span>
+        <span class="label">收到 LINE 連結</span>
+        <span class="sub">團主或活動通知分享報名連結</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- 2. Open form -->
+      <div class="node node-blue">
+        <span class="icon">🌐</span>
+        <span class="label">手機瀏覽器直接開啟表單</span>
+        <span class="sub">不需下載任何 App</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- 3. Fill info -->
+      <div class="node node-indigo">
+        <span class="icon">✍️</span>
+        <span class="label">填寫報名資料</span>
+        <span class="sub">家長姓名・Email・電話・孩子姓名・年級</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- 4. Camp selection (decision + branches) -->
+      <div class="branch-wrapper">
+        <div class="decision">
+          <span class="icon">🏕️</span>
+          選擇<br/>想參加的<br/>營隊
+        </div>
+
+        <!-- branch lines down -->
+        <div class="branches">
+          <div class="branch">
+            <div class="arrow-line"></div>
+            <div class="branch-tag">山山來馳</div>
+            <div class="branch-line-v"></div>
+            <div class="branch-node">🔗 顯示<br/>山山來馳付款連結</div>
+          </div>
+          <div class="branch">
+            <div class="arrow-line"></div>
+            <div class="branch-tag">樂高爭霸戰</div>
+            <div class="branch-line-v"></div>
+            <div class="branch-node">🔗 顯示<br/>樂高爭霸戰付款連結</div>
+          </div>
+          <div class="branch">
+            <div class="arrow-line"></div>
+            <div class="branch-tag">其他營隊⋯</div>
+            <div class="branch-line-v"></div>
+            <div class="branch-node">🔗 顯示<br/>對應付款連結</div>
+          </div>
+        </div>
+
+        <!-- converge back -->
+        <div class="branch-converge" style="height:28px; position:relative; width:100%; max-width:620px;">
+          <svg width="100%" height="28" xmlns="http://www.w3.org/2000/svg">
+            <line x1="16.5%" y1="0" x2="50%" y2="28" stroke="#B0B8D0" stroke-width="2"/>
+            <line x1="50%"  y1="0" x2="50%" y2="28" stroke="#B0B8D0" stroke-width="2"/>
+            <line x1="83.5%" y1="0" x2="50%" y2="28" stroke="#B0B8D0" stroke-width="2"/>
+          </svg>
+        </div>
+
+        <div class="arrow"><div class="arrow-head"></div></div>
+      </div>
+
+      <!-- 5. Payment -->
+      <div class="node node-pay" style="margin-top:8px;">
+        <span class="icon">💳</span>
+        <span class="label">前往藍新金流完成付款</span>
+        <span class="sub">填寫信用卡資料 → 付款成功</span>
+      </div>
+
+    </div><!-- /lane-body.parent -->
+
+    <!-- ══ 分隔區（Webhook） ══ -->
+    <div class="lane-divider">
+      <div class="arrow-line" style="background:#C0C8D8;"></div>
+      <div class="webhook-label">⚡ 付款成功 Webhook 通知</div>
+      <div class="arrow-line" style="background:#C0C8D8;"></div>
+      <div class="arrow-head" style="border-top-color:#C0C8D8;"></div>
+    </div>
+
+    <!-- ══ 後台自動化 ══ -->
+    <div class="lane-label backend">
+      <span>⚙️</span> 後台自動化
+    </div>
+    <div class="lane-body backend">
+
+      <!-- 6. Make.com trigger -->
+      <div class="node node-green">
+        <span class="icon">🔄</span>
+        <span class="label">Make.com 接收通知</span>
+        <span class="sub">自動識別付款者 Email 與所選營隊</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- 7. Parallel actions -->
+      <div class="parallel">
+        <div class="parallel-branch">
+          <div class="parallel-line-v"></div>
+          <div class="node node-purple" style="min-width:0;">
+            <span class="icon">📄</span>
+            <span class="label">寄出 PDF 契約書</span>
+            <span class="sub">固定內容契約書<br/>寄至家長 Email</span>
+          </div>
+        </div>
+        <div class="parallel-branch">
+          <div class="parallel-line-v"></div>
+          <div class="node node-hubspot" style="min-width:0;">
+            <span class="icon">🗂️</span>
+            <span class="label">HubSpot 建立聯絡人</span>
+            <span class="sub">姓名・Email・電話<br/>報名營隊・付款狀態</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /lane-body.backend -->
+
+  </div><!-- /diagram -->
+
+  <!-- ── 工具列表 ── -->
+  <div class="tool-row">
+    <div class="tool-badge"><div class="dot dot-blue"></div> <strong>Tally.so</strong> — 手機友善報名表單</div>
+    <div class="tool-badge"><div class="dot dot-pay"></div> <strong>藍新金流</strong> — 線上付款</div>
+    <div class="tool-badge"><div class="dot dot-green"></div> <strong>Make.com</strong> — 自動化流程</div>
+    <div class="tool-badge"><div class="dot dot-purple"></div> <strong>Gmail</strong> — 契約書寄送</div>
+    <div class="tool-badge"><div class="dot dot-orange"></div> <strong>HubSpot</strong> — 聯絡人管理</div>
+  </div>
+
+</body>
+</html>

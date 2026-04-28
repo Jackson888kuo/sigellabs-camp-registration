@@ -1,0 +1,30 @@
+# 敏感資料 — 絕不可推
+client_secret_*.json
+*_oauth_*.json
+*credentials*.json
+.env
+.env.*
+
+# Make.com Blueprint — 含 WooCommerce ck_/cs_ keys + HubSpot connection ID
+make_blueprint*.json
+fixed_blueprint*.json
+
+# 測試 payload 含個資
+test_payloads_*.json
+
+# 活動設定表 — 含付款 token
+活動設定表_Phase5*.xlsx
+活動設定表_Phase5*.csv
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# 暫存
+*.tmp
+*.bak
+*.log

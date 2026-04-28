@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#f5f5f5;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f5f5;">
+  <tr><td align="center" style="padding:32px 16px;">
+    <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+      <!-- Header -->
+      <tr>
+        <td style="background-color:#e07b00;padding:28px 32px;text-align:center;">
+          <p style="margin:0;font-size:26px;font-weight:bold;color:#ffffff;letter-spacing:2px;">☀️ 太陽實驗室</p>
+          <p style="margin:6px 0 0 0;font-size:14px;color:#fff3e0;letter-spacing:1px;">2026 夏令營報名確認通知</p>
+        </td>
+      </tr>
+
+      <!-- Greeting -->
+      <tr>
+        <td style="padding:28px 32px 0 32px;">
+          <p style="margin:0;font-size:16px;color:#333;line-height:1.7;">
+            親愛的 <strong>{{get(map(1.data.fields; "value"; "label"; "家長姓名"); 1)}}</strong> 家長您好，
+          </p>
+          <p style="margin:12px 0 0 0;font-size:15px;color:#555;line-height:1.8;">
+            感謝您為孩子報名 2026 太陽實驗室夏令營！我們已成功收到報名資料，請於 <strong style="color:#e07b00;">7 天內完成繳費</strong>，以確保報名席位。
+          </p>
+        </td>
+      </tr>
+
+      <!-- Registration Summary Box -->
+      <tr>
+        <td style="padding:20px 32px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff8f0;border:1px solid #ffd699;border-radius:8px;">
+            <tr>
+              <td style="padding:20px 24px;">
+                <p style="margin:0 0 4px 0;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;">報名資訊</p>
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
+                  <tr>
+                    <td style="padding:6px 0;font-size:14px;color:#888;width:90px;">孩子姓名</td>
+                    <td style="padding:6px 0;font-size:14px;color:#333;font-weight:bold;">{{get(map(1.data.fields; "value"; "label"; "孩子姓名"); 1)}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;font-size:14px;color:#888;">報名營隊</td>
+                    <td style="padding:6px 0;font-size:14px;color:#333;font-weight:bold;">{{join(map(get(map(1.data.fields; "options"; "label"; "報名營隊"); 1); "text"; "id"; get(map(1.data.fields; "value"; "label"; "報名營隊"); 1)); "、")}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;font-size:14px;color:#888;">付款狀態</td>
+                    <td style="padding:6px 0;font-size:14px;color:#e07b00;font-weight:bold;">⚠️ 尚未付款</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;font-size:14px;color:#888;">報名時間</td>
+                    <td style="padding:6px 0;font-size:14px;color:#333;">{{formatDate(1.createdAt; "YYYY年MM月DD日 HH:mm")}}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Payment Links Section -->
+      <tr>
+        <td style="padding:0 32px 8px 32px;">
+          <p style="margin:0 0 12px 0;font-size:15px;color:#333;font-weight:bold;">請點選對應營隊完成繳費：</p>
+          {{if(contains(join(map(get(map(1.data.fields;"options";"label";"報名營隊");1);"text";"id";get(map(1.data.fields;"value";"label";"報名營隊");1));",");"重返案發現場");"<div style='margin:8px 0;'><a href='https://core.newebpay.com/EPG/sigellab/TbMdb0' style='display:inline-block;background-color:#e07b00;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;'>💳 立即繳費 — 重返案發現場</a></div>";"")}}
+          {{if(contains(join(map(get(map(1.data.fields;"options";"label";"報名營隊");1);"text";"id";get(map(1.data.fields;"value";"label";"報名營隊");1));",");"ATTACK 用電");"<div style='margin:8px 0;'><a href='https://core.newebpay.com/EPG/sigellab/ZBbuwY' style='display:inline-block;background-color:#e07b00;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;'>💳 立即繳費 — ATTACK 用電</a></div>";"")}}
+          {{if(contains(join(map(get(map(1.data.fields;"options";"label";"報名營隊");1);"text";"id";get(map(1.data.fields;"value";"label";"報名營隊");1));",");"旅程製造所");"<div style='margin:8px 0;'><a href='https://core.newebpay.com/EPG/sigellab/4IIoQ0' style='display:inline-block;background-color:#e07b00;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;'>💳 立即繳費 — 旅程製造所</a></div>";"")}}
+          {{if(contains(join(map(get(map(1.data.fields;"options";"label";"報名營隊");1);"text";"id";get(map(1.data.fields;"value";"label";"報名營隊");1));",");"Game Designer");"<div style='margin:8px 0;'><a href='https://core.newebpay.com/EPG/sigellab/HiAE2i' style='display:inline-block;background-color:#e07b00;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;'>💳 立即繳費 — Game Designer</a></div>";"")}}
+          {{if(contains(join(map(get(map(1.data.fields;"options";"label";"報名營隊");1);"text";"id";get(map(1.data.fields;"value";"label";"報名營隊");1));",");"公園設計");"<div style='margin:8px 0;'><a href='https://core.newebpay.com/EPG/sigellab/fXSgo9' style='display:inline-block;background-color:#e07b00;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;'>💳 立即繳費 — 公園設計</a></div>";"")}}
+          {{if(contains(join(map(get(map(1.data.fields;"options";"label";"報名營隊");1);"text";"id";get(map(1.data.fields;"value";"label";"報名營隊");1));",");"未來家園");"<div style='margin:8px 0;'><a href='https://core.newebpay.com/EPG/sigellab/yY4Ig8' style='display:inline-block;background-color:#e07b00;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;'>💳 立即繳費 — 未來家園</a></div>";"")}}
+        </td>
+      </tr>
+
+      <!-- Warning -->
+      <tr>
+        <td style="padding:16px 32px 28px 32px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff3cd;border:1px solid #ffc107;border-radius:8px;">
+            <tr>
+              <td style="padding:16px 20px;">
+                <p style="margin:0;font-size:14px;color:#664d03;line-height:1.7;">
+                  ⏰ <strong>請注意：</strong>報名席位將保留 <strong>7 天</strong>，逾期未繳費將取消報名資格。若有任何問題，歡迎回覆此信件或聯絡我們。
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="background-color:#f5f5f5;padding:20px 32px;text-align:center;border-top:1px solid #e0e0e0;">
+          <p style="margin:0;font-size:13px;color:#888;">太陽實驗室 SIGE Labs｜hello@sigellabs.com</p>
+          <p style="margin:4px 0 0 0;font-size:12px;color:#aaa;">此信件由系統自動發送，請勿直接回覆。</p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Issue #5 — 報名追蹤表「提交時間」UTC → Asia/Taipei 修復實作紀錄
+# Issue #5 — 報名追蹤表時區/顯示格式修復實作紀錄
 
 ## 基本資訊
 
@@ -6,7 +6,7 @@
 |---|---|
 | Issue | https://github.com/Jackson888kuo/sigellabs-camp-registration/issues/5 |
 | 優先級 | 🟡 P1 |
-| 採用方案 | 方案 A（Make `formatDate`）+ Backfill B1（Apps Script 一次性轉換） |
+| 最終採用方案 | **C：Sheets 儲存格數字格式 + 試算表時區設定** |
 | 處理日期 | 2026-04-28 |
 | 負責人 | Jackson + Claude（Cowork） |
 
@@ -17,30 +17,60 @@
 報名追蹤表 (Google Sheets) A 欄「提交時間」原樣寫入 Tally webhook 的 `createdAt` ISO 8601 UTC 字串（例：`2026-04-28T01:45:30.375Z`），導致：
 
 - 營運人員需心算 +8 小時，閱讀效率低
-- 跨日資料易誤判（例：台北 04-28 09:45 顯示為 04-28 01:45，看起來像凌晨報名）
-- 下游若用此欄位做樞紐分析，時區錯誤會擴散
+- 跨日資料易誤判
+- H 欄「付款時間」也有相同顯示問題
+
+---
+
+## 方案演進與最終決策
+
+| 版本 | 方法 | 結果 |
+|---|---|---|
+| v1 | Apps Script `setValues` 寫入 `yyyy-MM-dd HH:mm:ss` 純文字 | ❌ 被 Sheets `USER_ENTERED` 行為解析回 Date 物件，顯示為 `yyyy/mm/dd hh:mm:ss` |
+| v2 | 改用 apostrophe (`'`) 前綴強制純文字 | ❌ Apps Script `setValues` 不識別 apostrophe，仍被解析為 Date |
+| **v3.1** | **不動 Date 物件，改用 `setNumberFormat('yyyy-mm-dd hh:mm:ss')` 控制顯示** | ✅ **成功** |
+
+**v3.1 採用理由：**
+- 順應 Apps Script `setValues` 強制 `USER_ENTERED` 的行為，不對抗
+- Date 物件保留可排序、可計算（如 `DATEDIF`）的特性
+- 套用一次永久生效，新進資料列自動套用相同格式
+- Make 寫入無論為 ISO 字串或 formatDate 字串，都會自動以正確時區/格式顯示
 
 ---
 
 ## 修復內容
 
-### 1. Make scenario 變更
+### 1. Sheets 側（已完成）
+
+**Apps Script 函式：** `applyDateFormat`（位於 `BackfillTimezone.gs`，bound 至報名追蹤表）
+
+執行結果：
+```
+格式套用完成 (v3.1)
+時區: Asia/Taipei
+套用範圍: A2:A1183 & H2:H1183
+當前資料列數: 183
+```
+
+驗證：
+- A 欄：`2026/04/03 15:45:32` → `2026-04-03 15:45:32` ✅
+- H 欄：`2026/04/04 11:03:39` → `2026-04-04 11:03:39` ✅
+
+### 2. Make 側（選用，建議實施以增強健壯性）
 
 **Scenario：** sigellabs-camp-registration（Phase 5 版本）
 **Module：** Module 13 — Google Sheets: Add a Row
 
-| Field | Before | After |
+| Field | Before | After（建議） |
 |---|---|---|
 | `Values.0`（A 欄 提交時間） | `{{1.createdAt}}` | `{{formatDate(1.createdAt; "YYYY-MM-DD HH:mm:ss"; "Asia/Taipei")}}` |
 
-**操作方式：** 於 Make Editor UI 親手拖拉建立 reference token，再以 `formatDate()` 函式包裹（避免 IML 純 API 寫入導致 resolve 失敗，詳見 `feedback_make_iml_api_risk.md`）。
+**Why 建議仍做：** Sheets 端的 cell format 已能正確顯示，但 Make 端統一格式可避免：
+- 未來 cell format 被誤改
+- 手動 Run once 時 raw UTC ISO 字串混入
+- 提供 data pipeline 的「形式即內容」清晰度
 
-### 2. 既有資料 Backfill
-
-- 程式：`docs/issues/issue-5-backfill.gs`（Apps Script）
-- 執行範圍：A 欄全部資料列（不含表頭）
-- 邏輯：解析 ISO 8601 → `Utilities.formatDate(d, "Asia/Taipei", "yyyy-MM-dd HH:mm:ss")`
-- 冪等性：以 regex `/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/` 偵測已轉換列，重複執行安全
+**Why 可不做：** 純從顯示角度，cell format 已解決。若覺得 Make Editor UI 操作有風險（IML reference token 問題），可先暫緩。
 
 ---
 
@@ -48,10 +78,10 @@
 
 | 測試案例 | 預期 | 實際 | 狀態 |
 |---|---|---|---|
-| T1 跨日邊界（UTC 22:45 → 台北 06:45） | `2026-04-28 06:45:46` | （待填入） | ⏳ |
-| T2 多營隊 Iterator 多列時間一致 | 兩列同 timestamp | （待填入） | ⏳ |
-| T3 真實表單即時送出 | A 欄與當下時間一致 | （待填入） | ⏳ |
-| T4 Backfill：歷史 ~N 列轉換 | 全部正確格式 | （待填入） | ⏳ |
+| T1 既有 183 列 A 欄顯示 | `YYYY-MM-DD HH:mm:ss` | `2026-04-03 15:45:32` | ✅ |
+| T2 既有 H 欄付款時間顯示 | `YYYY-MM-DD HH:mm:ss` | `2026-04-04 11:03:39` | ✅ |
+| T3 試算表時區 | Asia/Taipei | Asia/Taipei | ✅ |
+| T4 新報名（待測） | A 欄 + H 欄正確顯示 | （待真實表單測試） | ⏳ |
 
 ---
 
@@ -59,17 +89,17 @@
 
 | 議題 | 說明 |
 |---|---|
-| **付款時間 I 欄一致性** | Module 13 `values.8` 目前為空字串。未來若新增「付款 webhook → updateRow」流程，務必使用相同 `formatDate(...; "Asia/Taipei")` 包裝 |
-| **後續新增時間欄位** | 任何新時間欄位（完課時間、退費時間…）皆採 `formatDate(date; "YYYY-MM-DD HH:mm:ss"; "Asia/Taipei")` 標準格式 |
-| **Sheets 欄位格式** | A 欄已設為「純文字」，避免被自動解析回日期物件 |
+| **未來新欄位** | 任何新時間欄位（完課時間、退費時間…）皆建議套用 `yyyy-mm-dd hh:mm:ss` cell format |
+| **試算表時區變更風險** | 若有人手動把 試算表時區從 Asia/Taipei 改成其他，顯示會偏移。建議 SOP 中註明 |
+| **欄位異動敏感度** | 若 Sheet 增刪欄位，A=提交時間、H=付款時間 的欄位假設可能失效。Apps Script 中改用 header name lookup 會更穩健（後續優化） |
 
 ---
 
 ## 變更檔案
 
 - `docs/issues/issue-5-implementation.md`（本文件）
-- `docs/issues/issue-5-backfill.gs`（Apps Script 程式碼）
-- Make Editor：scenario「sigellabs-camp-registration」Module 13（無法 commit，僅紀錄變更內容）
+- `docs/issues/issue-5-backfill.gs`（v3.1 程式碼，部署於報名追蹤表 Apps Script）
+- Make Editor：scenario「sigellabs-camp-registration」Module 13（**選用**，未變更則記為 deferred）
 
 ---
 
@@ -77,4 +107,4 @@
 
 | 日期 | 變更 | 變更者 |
 |---|---|---|
-| 2026-04-28 | 初版建立、方案決議、Apps Script 完成 | Jackson + Claude |
+| 2026-04-28 | 初版建立、方案決議、Apps Script 完成（v1 → v3.1）| Jackson + Claude |

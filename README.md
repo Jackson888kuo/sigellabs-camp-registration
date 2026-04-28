@@ -37,6 +37,7 @@ Array Aggregator + SendGrid (確認信)
 | 📘 SOP | [sop/Phase5_匯入SOP_v1.docx](sop/Phase5_匯入SOP_v1.docx) | Phase 5 匯入流程 |
 | ✉️ 模板 | [templates/sendgrid_email_v2.html](templates/sendgrid_email_v2.html) | 確認信 v2 |
 | ✉️ 模板 | [templates/confirmation_email_fixed.html](templates/confirmation_email_fixed.html) | 確認信修正版 |
+| 🤝 協作 | [docs/AI協作工作流.md](docs/AI協作工作流.md) | Claude AI 協作標準流程：Cowork / Claude Code / GitHub Issues / gh CLI 分工與啟動模板 |
 
 ## Issue Tracking
 

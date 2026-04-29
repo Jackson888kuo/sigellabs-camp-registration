@@ -144,13 +144,37 @@
 
 ---
 
-## 4. 5/5 後的驗證計畫
+## 4. 5/5 前後的驗證計畫（2026-04-29 更新）
+
+### 4.1 驗證方法比較與決定
+
+| 方法 | 作法 | 風險 | 採用 |
+|---|---|---|---|
+| A：改 Sheets 8.D 為過去日期 | 把測試列 D 欄從 2026-05-05 改為 2026-04-28，replay 後改回 | 🟢 低（只動 Sheets 一格 cell，不動 IML）| ✅ **採用** |
+| B：改 Module 9 period 為 hardcode "normal" | 暫時改 IML，測完還原 | 🟡 中（動 IML 有 truncation 風險）| ❌ 否決 |
+| C：不驗證，5/5 後監控 | 直接信任 IML 邏輯 | 🔴 高 | ❌ 否決 |
+
+### 4.2 採用方法 A 的詳細步驟
+
+| 步驟 | 動作 | 預期結果 |
+|---|---|---|
+| 4.2.1 | 在 Sheets 找一列**測試專用列**（建議用「電學營」那列；用 Tally 送 form 時就指定這個營隊） | - |
+| 4.2.2 | 把該列 D 欄（早鳥截止日）原值 `2026-05-05` 記下；改為 `2026-04-28` | Sheets 顯示新日期 |
+| 4.2.3 | 立即在 Make Editor 點 Run once；用 Tally 送一筆測試報名（電學營、3人團報） | scenario 執行 |
+| 4.2.4 | 看 Module 9 OUTPUT | `period = "normal"` |
+| 4.2.5 | 看 Module 10 OUTPUT | `selected_price = 11400`（8.G 正常 3 人）；`payment_link` 為 8.K 正常連結 |
+| 4.2.6 | 看 Module 10b OUTPUT | `payment_button_html` 含正常價金額 + 正常連結 |
+| 4.2.7 | 開 Gmail 查收 | email 顯示 NT$ 11400 + 正常價連結 |
+| 4.2.8 | **立即把 Sheets 該列 D 欄改回 `2026-05-05`** | Sheets 復原 |
+| 4.2.9 | 再 replay 一次同樣測試 | 結果回到早鳥（NT$ 10900 + PLvfUn） |
+
+### 4.3 5/5 當日真實切換驗證
 
 | 項目 | 動作 |
 |---|---|
-| 早鳥期 → 正常期切換 | 由 Module 9 period 公式自動切換（`{{if(now <= parseDate(8.``3``; "YYYY-MM-DD"); "early_bird"; "normal")}}`） |
-| 5/5 當日驗證 | Tally 送出測試表單，確認 email 顯示「正常價」金額（NT$ 11400 等）+ 「正常價」連結 |
-| 提前驗證（5/5 前） | 暫時改 Module 9 period 為 hardcode `"normal"`，replay 看結果，**測完還原回動態公式** |
+| 早鳥 → 正常期切換 | 由 Module 9 period 公式自動切換（`{{if(now <= parseDate(8.``3``; "YYYY-MM-DD"); "early_bird"; "normal")}}`） |
+| 5/5 當日驗證 | Tally 送一筆測試報名，確認 email 為正常價金額 + 連結 |
+| 監控前 N 筆報名 | 5/5 當天 + 5/6，密集查看實際報名者 email 渲染（自己掛 BCC 或請報名者回報截圖） |
 
 ---
 
@@ -180,9 +204,38 @@
 
 ---
 
-## 7. 維護紀錄
+## 7. 6 天執行時間表（2026-04-29 制定）
+
+| 日期 | 階段 | 動作 | 完成 |
+|---|---|---|---|
+| 4/29（三）| Pre-flight | (1) 確認 Spec 對齊；(2) 在 Make Editor 匯出 blueprint snapshot 備份（檔名 `blueprint_v178_pre_issue1.json`）；(3) 確認 Sheets 測試列為「電學營」 | ⬜ |
+| 4/30（四）~ 5/1（五）| 主操作 | 執行 §3 Step 1–5（UI 新增 Module 10b、移除 Module 10 舊變數、Module 14 改 ref、Save） | ⬜ |
+| 5/2（六）| 早鳥期驗證 | Run once + Tally 送早鳥測試 → 確認 email 顯示 NT$ 10900 + PLvfUn | ⬜ |
+| 5/3（日）| 模擬 normal 期驗證 | 執行 §4.2 步驟（改 Sheets 8.D → replay → 還原） | ⬜ |
+| 5/4（一）| Buffer | 預留 buffer day，處理任何意外 | ⬜ |
+| 5/5（二）| 真實切換 | Tally 送一筆測試確認自動切到 normal；當日監控前 N 筆實際報名 | ⬜ |
+| 5/6（三）| 收尾 | 關閉 Issue #1；更新 memory；Project Board 移到 ✅ Done | ⬜ |
+
+> 💡 **若任何天遇到失敗**：立即用備份 blueprint PATCH 還原（`?blueprintId=178`），保住 5/5 前的早鳥流程繼續運作，其餘步驟順延。
+
+---
+
+## 8. Pre-flight 備援步驟（4/29 必做）
+
+| # | 步驟 | 命令/動作 |
+|---|---|---|
+| 1 | 匯出當前 blueprint v178 | Make Editor → 右上選單 → Export Blueprint → 存為 `blueprint_v178_pre_issue1_20260429.json` |
+| 2 | 把備份放到 GitHub repo | `git mv` 到 `github-repo/backups/` 並 commit |
+| 3 | 確認 blueprintId 178 仍可從 API 抓回 | 在 Chrome Console 執行 `fetch('https://us2.make.com/api/v2/scenarios/4596472/blueprints?teamId=2085532')` 確認 178 在列表中 |
+| 4 | 記下緊急回退步驟 | PATCH `https://us2.make.com/api/v2/scenarios/4596472?teamId=2085532` body: `{blueprint: <v178 json string>, scheduling: ...}` |
+| 5 | 暫時 disable scenario？ | ❌ 不要 disable，否則早鳥期報名會停。改用「先建 10b 再動 10/14」的順序保持線上運作 |
+
+---
+
+## 9. 維護紀錄
 
 | 日期 | 變更 | 變更者 |
 |---|---|---|
 | 2026-04-28 | 初版 spec（方案 B Console API） | Jackson + Claude（Cowork） |
 | 2026-04-28 | 方案 B 嘗試失敗 + 緊急回退；改為方案 D UI 路線 | Jackson + Claude（Cowork） |
+| 2026-04-29 | 驗證方法改為 §4.2 Sheets 8.D 法（取代原 IML hardcode 法）；新增 §7 時間表與 §8 pre-flight | Jackson + Claude（Cowork） |

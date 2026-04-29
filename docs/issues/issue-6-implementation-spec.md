@@ -31,38 +31,53 @@
 
 ---
 
-## 2. 根因分析
+## 2. 根因分析（2026-04-29 v6 blueprint 對比後修正版）
 
-### 2.1 Module 5（Iterator/BasicFeeder）目前的 IML
+### 2.1 Module 5（Iterator/BasicFeeder）v6 production 實際 IML
 
 ```iml
-{{map(get(map(1.data.fields; "options"; "label"; "報名營隊"); 1); "text"; "id"; get(map(1.data.fields; "value"; "label"; "報名營隊"); 1))}}
+{{map(get(map(1.data.fields; "options"; "key"; "question_bkOj1Z"); 1); "text"; "id"; get(get(map(1.data.fields; "value"; "key"; "question_bkOj1Z"); 1); 1))}}
 ```
 
-### 2.2 IML 拆解
+> ⚠️ **此 IML 與舊 phase5 blueprint 不同** — 舊版用 `"label"; "報名營隊"`，現行 v6 改用 `"key"; "question_bkOj1Z"`，並多了一層 `get(...; 1)` 取第一個元素。
 
-| 層 | 表達式 | 回傳值 | 說明 |
-|---|---|---|---|
-| 1 | `map(1.data.fields; "options"; "label"; "報名營隊")` | `[ [opt1..opt6] ]` | 取出 label 為「報名營隊」的欄位的 `options` 屬性，包成陣列 |
-| 2 | `get(...; 1)` | `[opt1..opt6]` | 取出第一個元素，得到 6 個 option 物件 |
-| 3 | `map(1.data.fields; "value"; "label"; "報名營隊")` | `[ ["uuid1","uuid2"] ]` | 取出該欄位的 `value` 屬性（家長勾選的 IDs） |
-| 4 | `get(...; 1)` | `["uuid1","uuid2"]` | 取出第一個元素，即「勾選 IDs 陣列」 |
-| 5 | `map(options[]; "text"; "id"; selected_ids[])` | **❌ 異常** | 4-arg map() 第 4 參數預期 scalar，傳入 array 觸發 fallback |
+### 2.2 重大發現：Module 5 是整個 scenario 唯一用 key-based 的模組
 
-### 2.3 根因確定（H1 + H2 組合）
+對 v6 blueprint 全文掃描 `1.data.fields` 的引用方式：
+
+| 引用方式 | 出現次數 | 模組 |
+|---|---|---|
+| `label`-based | **11 處** | Module 2, 9, 10（多處）, 11, 13 |
+| `key`-based | **1 處** | **Module 5（唯一）** |
+
+**關鍵對照**：Module 10 的 `group_size_text` 用了**和 Module 5 完全相同的 IML pattern**（`map(...) → get → map(options; text; id; selected) → get`），但用 `"label"; "團報人數"` → 運作正常。
+
+### 2.3 根因確定
 
 | 假設 | 結論 |
 |---|---|
-| H1：Iterator 來源錯誤 | ✅ 確認：Iterator 拿到的 array 包含全部 6 個營隊文字，而非勾選子集 |
-| H2：缺少 Filter 過濾 | ✅ 確認：Module 5 後直接接 Module 8（filterRows），無 selection-aware 過濾 |
-| H3：Tally 多選 parse 失敗 | ⚠️ 部分相關：Tally `value` 確實為 ID 陣列，IML 第 5 層 fallback 把過濾條件失效 |
-| H4：分支 regression | ❌ 否決：blueprint 無 Router 分支，「兩個以上營隊」與單選共用同一條 flow |
+| **H5：`question_bkOj1Z` 不是有效的 Tally 欄位 key** | ✅ 確認 — 兩層 `map(...; "key"; "question_bkOj1Z")` 皆回傳空 → `get(...)` 取出 `null` → 外層 `map(...; "text"; "id"; null)` Make IML fallback 為「不過濾、回傳全部 mapped」→ 6 個營隊全寫入，完全符合症狀 |
+| H1（舊版假設）：Iterator 來源錯誤 | 🟡 部分對 — 結果是錯的，但機制不是 array filter 失效，而是 key 不存在導致 fallback |
+| H2（舊版假設）：缺少 Filter 過濾 | ✅ 仍然成立 — 即使 key 修對，沒 Filter 也擋不住「全選」場景 |
+| H3：Tally 多選 parse 失敗 | ❌ 否決 — Tally 沒問題，是 IML 用了壞 key |
+| H4：分支 regression | ❌ 否決 |
 
-### 2.4 為何 6 個營隊全部寫入
+### 2.4 為何單選分支沒踩到此 bug
 
-Make IML 的 4-arg `map()` 在 `filterValue` 為 array 時，無法做 `item.id == [array]` 的純量比較，**fallback 為「不過濾、回傳全部 mapped」**，導致 Iterator 收到 6 個 option 的 text 而非僅勾選 2 個。
+Make IML 的 4-arg `map()` 在 `filterValue` 為 `null` 時，fallback 為「不過濾」回傳全部。但**單選**情境下這個 fallback 也會吐 6 個營隊文字 — 然後 Iterator 跑 6 cycles，每 cycle 在 Module 8 filterRows 用 `{{5.value}}` 去比對活動設定表 → 6 個都比中（因為 6 列都是有效營隊名）→ 6 列追蹤表寫入。
 
-> 📌 補充：單選分支恰好幸運不踩到此 bug — 因為 Tally 對單選的 `value` 是 scalar string，filter 比較成立，map 過濾正確返回 1 個元素。
+**所以單選情境其實也踩到 bug，只是症狀沒被注意到** — 因為大部分人單選一個營隊就不會檢查為什麼追蹤表多了 5 列其他營隊。
+
+> 📌 對照 H5 之後再驗證一次：testing0944 那筆 bug 報告（4/28）已是 v6 IML 上線後的紀錄，confirms key-based IML 從 v6 開始就壞掉了。
+
+### 2.5 新發現：v6 與舊 phase5 blueprint 的其他差異（不影響本次修法但要知道）
+
+| 項目 | 舊 phase5 | v6 production |
+|---|---|---|
+| Module 13 營隊欄索引 | `values["6"]` | `values["5"]` |
+| Module 14 Aggregator | 單一 value 欄 | `parent_email` + `payment_button_html` 兩欄 |
+| Module 9 period 公式 | 含 `isEmpty` fallback | 簡化版（移除 fallback）|
+| Module 11 自訂欄位 | 含 `child_1_deal_course` 等 | 已移除，僅保留 5 個基本欄位 |
 
 ---
 
@@ -120,15 +135,16 @@ Make IML 的 4-arg `map()` 在 `filterValue` 為 array 時，無法做 `item.id 
 | 2.4 | Condition 設定如下（見 §4.4）|
 | 2.5 | 點 OK 儲存 |
 
-#### Step 3：依序修改 5 處 `5.value` reference 為 `5.value.text`
+#### Step 3：依序修改 4 處 `5.value` reference 為 `5.value.text`
 
-| 序 | 模組 | 欄位 | 動作 |
-|---|---|---|---|
-| 3.1 | Module 8（Sheets filterRows） | filter conditions[0][0].b | 刪除 `{{5.value}}` token → 從左側面板拖拉 Module 5 的 `value.text` 進入 |
-| 3.2 | Module 10（SetVariables）| `payment_button_html` 變數中 `💳 立即繳費 — {{5.value}}` 那段 | 同上 |
-| 3.3 | Module 11（HubSpot createDeal）| `dealname` 中 `× {{5.value}}` | 同上 |
-| 3.4 | Module 11 | `child_1_deal_course` 整欄 `{{5.value}}` | 同上 |
-| 3.5 | Module 13（Sheets addRow）| `values["6"]`（報名營隊欄）整欄 `{{5.value}}` | 同上 |
+> ⚠️ **依 v6 blueprint 實際掃描，只有 4 處**（原 spec 寫 5 處有誤；Module 11 在 v6 已移除 `child_1_deal_course`）
+
+| 序 | 模組 | 欄位 | 改動前 | 改動後 |
+|---|---|---|---|---|
+| 3.1 | Module 8（Sheets filterRows） | filter conditions[0][0].b | `{{5.value}}` | 刪除 → 從左側面板拖拉 Module 5 的 `value.text` 進入 |
+| 3.2 | Module 10（SetVariables）| `payment_button_html` 變數中 `🏕️{{5.value}}` 那段 | `{{5.value}}` | 同上 |
+| 3.3 | Module 11（HubSpot createDeal）| `dealname` 中 `× {{5.value}}` | `{{5.value}}` | 同上 |
+| 3.4 | Module 13（Sheets addRow）| **`values["5"]`**（v6 索引；舊 phase5 是 6）| `{{5.value}}` | 同上 |
 
 > ⚠️ **關鍵**：每處都用 UI 左側面板拖拉新 token（顯示為彩色膠囊），**禁止鍵盤直接打字 `5.value.text`** — 純文字 reference 在 IML 執行階段會 resolve 失敗（已在 Issue #1 方案 B 踩過此陷阱，詳見 [`feedback_make_iml_api_risk.md`](../../memory/feedback_make_iml_api_risk.md)）。
 
@@ -149,15 +165,15 @@ Make IML 的 4-arg `map()` 在 `filterValue` 為 array 時，無法做 `item.id 
 ```
 
 **改動說明**：
-- 原 IML：5 層巢狀，最外層 4-arg map 失效
-- 新 IML：只取 options 陣列，**不過濾**
+- 原 IML（v6 production）：用了 key `question_bkOj1Z`（無效），且巢狀 map 結構複雜
+- 新 IML：**改回 label-based**，與 scenario 內其他 11 處引用一致；只取 options 陣列，**不過濾**
 - 過濾邏輯改由 Step 2 的 Filter 處理，職責分離
 
 **Iterator 輸出結構變更**：
 
 | 改動前 | 改動後 |
 |---|---|
-| `5.value` = string（營隊名文字） | `5.value` = object `{id, text}` |
+| `5.value` = string（營隊名文字，但因 fallback 是錯的全集）| `5.value` = object `{id, text}` |
 | 在下游用 `{{5.value}}` 直接取營隊名 | 改用 `{{5.value.text}}` 取營隊名 |
 
 ---
@@ -179,23 +195,27 @@ Make IML 的 4-arg `map()` 在 `filterValue` 為 array 時，無法做 `item.id 
 
 > 💡 建議組合方式：在輸入欄位先打 `{{contains(}}`，再從左側面板拖拉「Webhook → 1 → data → fields」之類路徑，最後加上 `; 5.value.id)`。可惜 Tally `value` 屬性需要先做 `map`+`get`，這段必須手鍵 — 接受此風險，因為**過濾邏輯無 reference 失敗風險**（不像 HTML 拼接會 truncate）。
 
+> 📌 **重要**：與 Module 5 Array IML 一樣，這裡用 `"label"; "報名營隊"`（與整個 scenario 其他 11 處引用一致），**不要用 `"key"; "question_bkOj1Z"`**（那個 key 是失效的，正是原 bug 來源）。
+
 **Make `contains()` 行為確認**：
 - `contains(array; element)` → 若 array 包含 element 回傳 `true`，否則 `false`
 - 此處 array = 勾選 ID 陣列；element = 當前 iteration 的 option ID
 
 ---
 
-## 5. 影響範圍清單（重點 ref 變更）
+## 5. 影響範圍清單（依 v6 blueprint 實際掃描）
 
-| 模組 | 欄位 | 改動前 | 改動後 |
+| 模組 | 欄位 | 改動前（v6 production）| 改動後 |
 |---|---|---|---|
-| Module 5 | Array | 5 層 IML | `{{get(map(1.data.fields; "options"; "label"; "報名營隊"); 1)}}` |
+| Module 5 | Array | key-based 巢狀 IML（用 `question_bkOj1Z`，無效）| `{{get(map(1.data.fields; "options"; "label"; "報名營隊"); 1)}}` |
 | 5→8 連線 | Filter | 無 | `contains(selected_ids; 5.value.id) = true` |
-| Module 8 | filter A | `{{5.value}}` | `{{5.value.text}}` |
-| Module 10 | payment_button_html 內文 | `{{5.value}}` | `{{5.value.text}}` |
-| Module 11 | dealname、child_1_deal_course | `{{5.value}}` | `{{5.value.text}}` |
-| Module 13 | values["6"] | `{{5.value}}` | `{{5.value.text}}` |
+| Module 8 | `filter[0][0].b` | `{{5.value}}` | `{{5.value.text}}` |
+| Module 10 | `variables[4].value`（payment_button_html）| `{{5.value}}` | `{{5.value.text}}` |
+| Module 11 | `properties[0].value`（dealname）| `{{5.value}}` | `{{5.value.text}}` |
+| Module 13 | `values["5"]` | `{{5.value}}` | `{{5.value.text}}` |
 | Module 14 | feeder reference | `feeder: 5` | 不變 |
+
+> 📌 v6 中 Module 11 已沒有 `child_1_deal_course` 欄位（與舊 phase5 不同），因此不需處理。
 
 ---
 
@@ -302,7 +322,8 @@ Make IML 的 4-arg `map()` 在 `filterValue` 為 array 時，無法做 `item.id 
 
 | 日期 | 變更 | 變更者 |
 |---|---|---|
-| 2026-04-29 | 初版建立（依 Sprint W18-W20 規劃） | Jackson + Claude（Cowork） |
+| 2026-04-29 AM | 初版建立（依 Sprint W18-W20 規劃；以舊 phase5 blueprint 為基礎） | Jackson + Claude（Cowork） |
+| 2026-04-29 PM | 對比 v6 production blueprint 後重大修正：<br>• §2 根因從「array filter 失效」改為「無效 key + fallback 不過濾」<br>• §4.3 IML 改回 label-based（與其他 11 處引用一致）<br>• §4.4 Filter IML 改用 label<br>• §5 待修 5 → 4 處（Module 11 child_1_deal_course 在 v6 已移除）<br>• Module 13 索引從 `values["6"]` 改 `values["5"]` | Jackson + Claude（Cowork） |
 
 ---
 

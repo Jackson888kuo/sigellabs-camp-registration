@@ -1,0 +1,92 @@
+name: Sync Issue Status from Labels
+
+# 觸發時機：當 Issue 被加上或移除特定 label 時
+on:
+  issues:
+    types:
+      - labeled
+      - unlabeled
+
+jobs:
+  sync-status:
+    name: 依 Label 自動移動到對應欄位
+    runs-on: ubuntu-latest
+    # 只處理 5 個指定 labels，避免每次 label 變動都跑
+    if: |
+      github.event.label.name == 'ready-to-test' ||
+      github.event.label.name == 'blocker' ||
+      github.event.label.name == 'needs-info'
+    steps:
+      - name: 設定 Project 欄位（依 label 對應）
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          # Project 與欄位 ID（已從之前查詢結果取得）
+          PROJECT_ID: PVT_kwHOBHMk7c4BWD2g
+          STATUS_FIELD_ID: PVTSSF_lAHOBHMk7c4BWD2gzhRbFfw
+          # Status 欄位的 6 個 Option ID
+          OPT_BACKLOG: '42e4d7a2'
+          OPT_NEXT_UP: '7fa51144'
+          OPT_BUILDING: '31958c7d'
+          OPT_READY_TO_TEST: '6fdbaca9'
+          OPT_NEEDS_FIX: '619ca03c'
+          OPT_LIVE: 'f1e0fb86'
+          ISSUE_NODE_ID: ${{ github.event.issue.node_id }}
+          LABEL_NAME: ${{ github.event.label.name }}
+          ACTION: ${{ github.event.action }}
+        run: |
+          # 依 label 決定目標 option
+          case "$LABEL_NAME" in
+            "ready-to-test")
+              [ "$ACTION" = "labeled" ] && TARGET=$OPT_READY_TO_TEST || TARGET=$OPT_BUILDING
+              ;;
+            "blocker")
+              [ "$ACTION" = "labeled" ] && TARGET=$OPT_NEEDS_FIX || TARGET=$OPT_BACKLOG
+              ;;
+            "needs-info")
+              [ "$ACTION" = "labeled" ] && TARGET=$OPT_BACKLOG || TARGET=$OPT_NEXT_UP
+              ;;
+            *)
+              echo "Label $LABEL_NAME 不在自動化範圍，跳過"
+              exit 0
+              ;;
+          esac
+
+          echo "Issue $ISSUE_NODE_ID label=$LABEL_NAME action=$ACTION → option=$TARGET"
+
+          # 找出該 Issue 在 Project 中的 item ID
+          ITEM_ID=$(gh api graphql -f query='
+            query($issueId: ID!, $projectId: ID!) {
+              node(id: $issueId) {
+                ... on Issue {
+                  projectItems(first: 10) {
+                    nodes { id project { id } }
+                  }
+                }
+              }
+            }' -f issueId="$ISSUE_NODE_ID" -f projectId="$PROJECT_ID" \
+            --jq ".data.node.projectItems.nodes[] | select(.project.id == \"$PROJECT_ID\") | .id")
+
+          if [ -z "$ITEM_ID" ]; then
+            echo "⚠️ Issue 不在 Project 中，先加入..."
+            ITEM_ID=$(gh api graphql -f query='
+              mutation($projectId: ID!, $contentId: ID!) {
+                addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                  item { id }
+                }
+              }' -f projectId="$PROJECT_ID" -f contentId="$ISSUE_NODE_ID" \
+              --jq '.data.addProjectV2ItemById.item.id')
+          fi
+
+          # 設定 Status 欄位
+          gh api graphql -f query='
+            mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $projectId
+                itemId: $itemId
+                fieldId: $fieldId
+                value: { singleSelectOptionId: $optionId }
+              }) { projectV2Item { id } }
+            }' -f projectId="$PROJECT_ID" -f itemId="$ITEM_ID" \
+              -f fieldId="$STATUS_FIELD_ID" -f optionId="$TARGET"
+
+          echo "✅ 完成移動"

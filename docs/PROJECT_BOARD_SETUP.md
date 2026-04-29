@@ -9,7 +9,7 @@
 1. 打開 https://github.com/users/Jackson888kuo/projects
 2. 右上角點 **New project** 綠色按鈕
 3. 選 **Board** 視圖（看板模式）
-4. Project name 輸入：`SIGE Labs 報名系統開發看板`
+4. Project name 輸入：`Sigel Labs 報名系統開發看板`
 5. 點 **Create project**
 
 ---

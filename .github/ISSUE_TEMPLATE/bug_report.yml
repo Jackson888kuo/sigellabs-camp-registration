@@ -1,0 +1,79 @@
+name: 🐞 Bug 回報
+description: 系統有不正常或不符合預期的狀況時，請使用此表單回報
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝您回報問題！請盡量提供越多資訊越好，這能幫助開發者快速定位並修復。
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 發生了什麼事
+      description: 用您看到的現象描述，不需要猜測技術原因
+      placeholder: 例如：點「儲存」按鈕後畫面卡住，沒有任何反應
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 您原本預期會發生什麼
+      description: 應該要有的正常結果
+      placeholder: 例如：應該要顯示「儲存成功」的綠色提示訊息
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 怎麼重現這個狀況
+      description: 請依步驟描述，這樣開發者才能複製問題
+      placeholder: |
+        1. 登入系統
+        2. 進入「訂單」頁面
+        3. 點選任一筆訂單
+        4. 修改地址欄位
+        5. 點「儲存」按鈕
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: 使用裝置
+      description: 桌機/手機？哪個瀏覽器？
+      placeholder: 例如：iPhone 14、Safari / MacBook Pro、Chrome
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截圖或錄影（強烈建議）
+      description: 請直接拖曳檔案到此處上傳。一張圖勝過千言萬語。
+      placeholder: 拖曳圖片或影片到這裡
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 嚴重程度
+      description: 這個問題對您的工作影響有多大？
+      options:
+        - 嚴重影響工作（無法使用核心功能）
+        - 不便但可繞過（有 workaround）
+        - 小瑕疵（不影響功能，例如顯示錯字）
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 其他線索（選填）
+      description: 例如：什麼時候開始發生的？只有特定情況會發生嗎？之前是正常的嗎？
+    validations:
+      required: false

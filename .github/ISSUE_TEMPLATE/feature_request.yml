@@ -1,0 +1,66 @@
+name: 💡 新功能需求
+description: 提出您希望系統能做的新功能（不需要技術背景，用您的話描述即可）
+title: "[功能] "
+labels: ["enhancement", "user-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝您提出建議！請用您熟悉的方式描述需求，技術細節會由開發者處理。
+
+  - type: textarea
+    id: what
+    attributes:
+      label: 想做什麼
+      description: 用一句話描述您希望系統能做的事
+      placeholder: 例如：我希望可以匯出客戶名單成 Excel
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: 為什麼需要這個功能
+      description: 這個功能會幫您解決什麼問題？沒有它您現在怎麼處理？
+      placeholder: 例如：每個月要寄電子報，目前要手動一筆筆複製，很花時間
+    validations:
+      required: true
+
+  - type: textarea
+    id: when
+    attributes:
+      label: 您會在什麼時候用到
+      description: 描述使用情境、頻率
+      placeholder: 例如：每月初寄送行銷信件前，大約每月 1 次
+    validations:
+      required: false
+
+  - type: textarea
+    id: mockup
+    attributes:
+      label: 期望的畫面或操作流程（選填）
+      description: 文字描述、手繪圖、參考截圖、其他系統的範例都歡迎。可直接拖曳圖檔到這裡。
+      placeholder: 例如：在客戶頁面右上角加一個「匯出」按鈕，點擊後跳出選擇欄位的視窗
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 重要程度
+      description: 這個功能對您的工作有多重要？
+      options:
+        - 沒有它工作會嚴重受阻
+        - 有了會大幅提升效率
+        - 有了會更方便，但不急
+        - 想到就提，有空再做
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 其他補充（選填）
+      description: 任何想補充的資訊
+    validations:
+      required: false

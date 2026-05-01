@@ -21,14 +21,14 @@ originSessionId: f72c2e4b-03ea-4d3a-a083-ec38f48399e3
 |---|---|---|---|---|---|---|
 | 1 | #6 | Iterator 勾 N 寫 N bug | bug / **P1** | 1.5 天 | 4/30 | ✅ 4/30 PM 完成（commit 3f23745、5000b63）|
 | 2 | #1 | Module 10 payment_button_html 動態化 | bug / **P1** | 1 天 | 5/1 凌晨 | ✅ 5/1 01:08 完成（commit 65aa256；新增 Module 27）|
-| **3** | **#12** | **Module 11 dealname replace() 缺 `""` 引數** | **bug / P1** | **0.5 天** | **5/1** | ⬜ Cowork review 發現、Claude Code 開立、待 PATCH |
-| 4 | #2 | 多營隊驗收測試 | bug / P2 | 0.5 天 | 5/2 | ⬜ 待 #12 完成後啟動 |
-| 5 | #3 | 早鳥日期防呆 | enhancement | 0.5 天 | 5/4 | ⬜ |
-| 6 | #8 | J 欄無表頭 + IML 未解析 | bug / P3 | 1 天 | 5/6–5/8 | ⬜ |
+| 3 | #12 | Module 11 dealname replace() 缺 `""` 引數 | bug / P1 | 0.5 天 | 5/1 | ✅ **5/1 完成**（API PATCH 補 `""`；修補前清 9 筆 T9 垃圾 Deal；T12 production 驗證乾淨）|
+| 4 | #2 | 多營隊驗收測試 | bug / P2 | 0.5 天 | 5/1 | ✅ **5/1 完成**（T12 雙營隊：21 ops、HubSpot 雙 Deal 名稱乾淨、Sheets 雙行 F 欄正確、Email 1 封 2 卡片；首次 5 渠道全覆蓋）|
+| **5** | **#3** | **早鳥日期防呆** | **enhancement** | **0.5 天** | **5/2 ~** | 🔲 **下一個** |
+| 6 | #8 | J 欄無表頭 + IML 未解析 | bug / P3 | 1 天 | 5/6–5/8 | 🔲 待排 |
 
 **排除：** #7 HubSpot 儀表板（冬令營後再評估）
 
-**5/1 sprint 順序變更：** 原「#6 → #2 → #1 → #3 → #8」改為「#6 → #1 → **#12** → #2 → #3 → #8」。#12 由 Cowork review 4/30 + 5/1 凌晨工作時抽查 HubSpot 發現的 production bug，需先修復才能進 #2 多營隊驗收（否則 dealname 髒資料會混淆驗收結果）。
+**5/1 收尾**：sprint 已大幅領先計畫 — 原訂 5/15 完成，實際 5/1 結束時已完成 4/6 issues（含 review 才浮現的 #12）。剩 #3 + #8，預估 1.5 天工作量，5/3 ~ 5/4 即可全 sprint 收尾、提早 11 天進入測試期。
 
 ## 關鍵決策（2026-04-29 Cowork）
 
@@ -43,10 +43,10 @@ originSessionId: f72c2e4b-03ea-4d3a-a083-ec38f48399e3
 ## How to apply
 
 - 開發對話開始時，先讀 `docs/sprints/2026-W18-W20-winter-camp-prep.md` + 最新 handoff 文件（位於 `docs/handoff/YYYY-MM-DD-*.md`）
-- 順序：**#6 ✅ → #1 ✅ → #12 → #2 → #3 → #8**
+- 順序：**#6 ✅ → #1 ✅ → #12 ✅ → #2 ✅ → #3 → #8**
 - 每步操作前匯出 blueprint snapshot 備份
 - 5/15 後進入測試期，6/1 起冷凍直到冬令營啟用
-- 進 #2 之前必確認 #12 修補完成 + HubSpot 9 筆 T9 垃圾 Deal 已清理（保留 1 T10 + 1 T11 作 before 對照）
+- 任何新 issue 動 IML → 驗收必涵蓋 5 渠道（M8/M10/M11/M13/M27），詳見 `feedback_acceptance_test_downstream_refs.md`
 
 ## 2026-04-29 PM 進度紀錄（晚間 22:55）
 
@@ -107,22 +107,43 @@ originSessionId: f72c2e4b-03ea-4d3a-a083-ec38f48399e3
 
 依 v2 spec §5 + 操作卡執行；操作卡是 v2 spec 的「執行版」，spec 是「設計版」，互相對照。
 
-## 2026-05-01 進度紀錄（Cowork review + Issue #12 開立）
+## 2026-05-01 完整進度紀錄
+
+### AM/PM 早段：Cowork review + Issue #12 開立
 
 | 項目 | 狀態 |
 |---|---|
 | Issue #6 4/30 PM 主操作 | ✅ commit 3f23745、5000b63；T4a/b/c 12/19/26 ops 通過；最終 fix 加第三 filter 條件 `if(5.value; "yes"; "no")` 真值判斷擋 null |
 | Issue #1 5/1 凌晨完成 | ✅ commit 65aa256；新增 Module 27 SetVariables；Module 14 改引 27.payment_button_html；Module 8 mapper.filter b 改 IML；T11 雙營隊 21 ops 通過 |
-| Cowork 5/1 PM review | ✅ 產出 `2026-05-01_Issue6_Issue1_Review.md`（工作資料夾，非 repo），9 條踩雷地圖 |
-| HubSpot Deal 抽查發現 Module 11 bug | 🚨 ≥15 筆錯誤 dealname；replace() 缺 `""` silent noop（H2 確定）|
-| Cowork → Claude Code 交接文件 | ✅ `docs/handoff/2026-05-01-cowork-to-claude-code-module11-replace-bug.md` |
-| Claude Code 開立 Issue #12 | ✅ `[Bug][P1] Module 11 dealname replace() 缺 "" 引數`、milestone Winter Camp Prep 2026 |
-| 清理策略決議 | ⬜ HubSpot 清 9 筆 T9 + T8 + 部分 T11 + test1259 ×2；保留 1 T10 + 1 T11 作 before 對照（執行由 Jackson 親自）|
-| Memory 系統更新 | ✅ 5 新增 + 4 更新（含本檔）|
+| Cowork 5/1 AM review | ✅ 9 條踩雷地圖；HubSpot 抽查發現 Module 11 ≥15 筆錯誤 dealname（replace 缺 `""` silent noop、H2 確定）|
+| Cowork → Claude Code 交接 | ✅ `docs/handoff/2026-05-01-cowork-to-claude-code-module11-replace-bug.md` |
+| Claude Code 開立 Issue #12 | ✅ `[Bug][P1] Module 11 dealname replace() 缺 "" 引數` |
+| Memory 系統 5/1 AM 更新 | ✅ 5 新增 + 4 更新 + bundle push commit `aa41799` |
 
-## ops 公式（5/1 Issue #1 後）
+### PM 晚段：Issue #12 + #2 修補與驗收
 
-`5 + N × 8`，N = Tally 勾選營隊數（N ≥ 2）。Issue #6 完成時為 `5 + N × 7`，新增 Module 27 後 +1 ops/迭代。
+| 項目 | 狀態 |
+|---|---|
+| HubSpot 清 9 筆 T9 垃圾 Deal | ✅ Jackson 手動執行；T10/T11 各保留 1 筆作 before 對照（Claude Code push back 採納）|
+| Issue #12 API PATCH 修補 | ✅ Module 11 dealname 兩處 `replace()` 補 `""`；GET blueprint 回讀確認；驗證 H2（純字面字串補完、API 安全） |
+| Issue #2 T12 多營隊驗收 | ✅ 雙營隊（STEAM Attack + Game Designer）；首次 5 渠道全覆蓋驗收 |
+| T12 結果：Make ops | ✅ 21 = `5 + 2×8` 公式吻合 |
+| T12 結果：HubSpot Deal name | ✅ 2 筆，格式 `<姓名> x [類別]營隊全名`，無前綴污染 |
+| T12 結果：Sheets 追蹤表 | ✅ 2 行，F 欄營隊名乾淨 |
+| T12 結果：Email 確認信 | ✅ 1 封 2 張付款卡片，金額 + 連結正確 |
+
+## ops 公式（5/1 Issue #1 後、與 T12 驗證對齊）
+
+`5 + N × 8`，N = Tally 勾選營隊數（N ≥ 2）。Issue #6 完成時為 `5 + N × 7`，新增 Module 27 後 +1 ops/迭代。T12 N=2 → 21 ops 完全吻合。
+
+## 5/1 額外提煉的教訓（已寫入 feedback memory）
+
+| 教訓 | 對應 memory |
+|---|---|
+| `replace(s; pat; )` 缺第三引數 silent noop | `feedback_make_iml_replace_empty_args.md` |
+| 驗收必涵蓋 5 渠道（T12 案例驗證）| `feedback_acceptance_test_downstream_refs.md` |
+| API PATCH 安全範圍細化（純字面字串補完、iterator output / 同模組 ref OK）| `feedback_make_iml_api_risk.md` |
+| 形式一致性必須由 lint 工具自動檢查 | `feedback_iml_lint_form_consistency.md` |
 
 ## 2026-04-30 開工建議流程
 

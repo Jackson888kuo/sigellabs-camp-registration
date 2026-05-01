@@ -26,4 +26,4 @@ Production 證據：4/30 16:31 ~ 4/30 16:59 期間建立的 5 筆 Deal（T10 / T
 
 **歷史教訓**：4/30 ~ 5/1 Issue #6 + Issue #1 兩次驗收都通過（ops + email 正確），但 Module 11 broken 沒被發現。原因：T 系列驗收只看 email + Sheets 時間，沒人開 HubSpot 看 dealname。**驗收覆蓋面盲點**詳見 `feedback_acceptance_test_downstream_refs.md`。
 
-**追蹤**：Issue #12（GitHub `Jackson888kuo/sigellabs-camp-registration#12`，2026-05-01 開立，由 Claude Code 修補）。
+**追蹤**：Issue #12（GitHub `Jackson888kuo/sigellabs-camp-registration#12`，2026-05-01 開立由 Claude Code 修補）— ✅ 5/1 PM 完成：API PATCH 補 `""`，T12 production 雙營隊驗證 dealname 乾淨（無 `孩子要報名哪些營隊？` 前綴）。修補方式驗證了「純字面字串補完 API PATCH 安全」的細化規則（詳見 `feedback_make_iml_api_risk.md`）。

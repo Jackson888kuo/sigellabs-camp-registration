@@ -33,13 +33,13 @@ originSessionId: 67676285-33e0-4f19-acbf-6fe2f171f546
 | 8 | `mapper.filter[0][0].b` | `{{replace(replace(5.label; "孩子要報名哪些營隊？ ("; ""); ")"; "")}}` | ✅ Issue #1 完成（原為靜態字串）|
 | 10 | `mapper.variables[2].value`、`variables[3].value` | `selected_price`、`payment_link`（用 8.4/8.6/8.8/8.10）| ✅ |
 | **27** | `mapper.variables[0].value` | HTML 內含 `🏕️{{replace(replace(5.label; "孩子要報名哪些營隊？ ("; ""); ")"; "")}}` + `{{10.selected_price}}` + `{{10.payment_link}}` | ✅ Issue #1 新增 |
-| **11** | `mapper.properties[0].value` (dealname) | `{{get(...孩子姓名...); 1)}} x {{replace(replace(5.label; "孩子要報名哪些營隊？ ("; **)**; ")"; **)**)}}` | ❌ **缺 `""`、Issue #12 修補中** |
+| 11 | `mapper.properties[0].value` (dealname) | `{{get(...孩子姓名...); 1)}} x {{replace(replace(5.label; "孩子要報名哪些營隊？ ("; ""); ")"; "")}}` | ✅ Issue #12 已修補（5/1）|
 | 13 | `mapper.values["5"]` | `{{replace(replace(5.label; "孩子要報名哪些營隊？ ("; ""); ")"; "")}}` | ✅ Issue #6 完成 |
 | 14 | `mapper.payment_button_html` | `{{27.payment_button_html}}` | ✅ Issue #1 完成（原引用已刪除的 10.payment_button_html）|
 
 ## 重要警示
 
-⚠️ **Module 11 dealname 兩處 `replace()` 缺 `""` 第三引數**（4/30 PATCH 時遺漏，5/1 review 抽查 HubSpot 才發現）。Production 已產出 ≥15 筆錯誤 dealname（含 `孩子要報名哪些營隊？ (...)` 完整前綴）。Issue #12 追蹤修補。詳見 `feedback_make_iml_replace_empty_args.md`。
+✅ **Module 11 dealname Issue #12 已於 5/1 修補完成**（API PATCH 補上兩處 `""`、T12 驗證 production dealname 乾淨）。歷史教訓：4/30 PATCH 時 Module 11 與 M13/M27 用了不同腳本字串、漏帶 `""` 兩處，造成 silent noop bug 累積 ≥15 筆錯誤 dealname；經驗已收錄至 `feedback_make_iml_replace_empty_args.md` + `feedback_iml_lint_form_consistency.md`。
 
 ⚠️ **Module 11 dealname 分隔符號是 ASCII ` x `（空格 + 0x78 + 空格），不是乘號 `× `**。Issue #6 v2 spec §3.3 / §7 / §11 寫成「× {{5.value}}」是 spec 撰寫時的錯誤。實際 blueprint hex bytes：`7d7d 2078 20`（即 `}}` + 空格 + `x` + 空格）。
 

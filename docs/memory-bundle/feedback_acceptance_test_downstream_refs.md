@@ -30,4 +30,17 @@ originSessionId: 6c7cda79-b439-450e-bcd5-e6a31bf6b8f4
 3. 寫 snapshot 一致性檢查腳本：比對 5 個 ref 在 blueprint 內的 IML 字面字串是否完全相同（diff 抓出意外不一致）
 4. Issue #2 多營隊驗收測試一定要含此清單
 
-**歷史教訓**：「腳本化批次 PATCH」的速度優勢造成「批次內形式一致」的錯覺；實際上批次內仍可能有單獨某個 module 的疏忽（這次是 Module 11）。**形式一致性**必須由腳本 / 工具自動檢查，不能仰賴肉眼。
+**歷史教訓**：「腳本化批次 PATCH」的速度優勢造成「批次內形式一致」的錯覺；實際上批次內仍可能有單獨某個 module 的疏忽（這次是 Module 11）。**形式一致性**必須由腳本 / 工具自動檢查，不能仰賴肉眼（詳見 `feedback_iml_lint_form_consistency.md`）。
+
+## ✅ 5/1 PM T12 案例：首次 5 渠道全覆蓋驗收
+
+| 渠道 | T12（雙營隊：STEAM Attack + Game Designer）結果 |
+|---|---|
+| Make ops 數 | 21 = `5 + 2 × 8` 完全吻合預期公式 |
+| Module 8 OUTPUT | 透過金額 / 連結正確隱含驗證（單價有對應到、連結非空）|
+| Module 10 OUTPUT | `selected_price` 與 `payment_link` 均對應正確 |
+| **HubSpot Deal name** | 2 筆，格式為 `<孩子姓名> x [類別]營隊全名`，無 `孩子要報名哪些營隊？` 前綴 ✅（Issue #12 修補後首次驗證）|
+| Sheets row F 欄 | 2 行，營隊名乾淨 |
+| Email 確認信 | 1 封 2 張付款卡片，營隊名 + 金額 + 連結三項皆正確 |
+
+T12 是 Issue #2 完成案，也是 Cowork 5/1 review 後新訂的「5 渠道全覆蓋」標準首次落地案例。後續 #3 / #8 驗收清單須沿用此模式。

@@ -1,22 +1,31 @@
 ---
-name: Make.com IML API 寫入風險
-description: 純 API 寫 IML reference 雖長度一致但執行時失敗 — Make 需要 UI 拖拉 token 的 hidden metadata
+name: Make IML API 寫入風險（5/1 細化版）
+description: API PATCH IML 安全性取決於內容類型 — 純函式 / iterator output reference 安全；跨模組 token 拼接仍須 UI 拖拉
 type: feedback
 originSessionId: c7030d75-b37c-40aa-bb15-e244f4a1070b
-copiedFrom: Cowork session memory 2026-04-30
 ---
-**規則：Make.com SetVariables / Aggregator 內帶 reference token（如 `5.value`、`10.selected_price`）的 IML 公式，必須用 Make Editor UI 拖拉產生，不能用 Chrome Console / Blueprint API 純文字寫入。**
+**規則（2026-05-01 細化版）**：Make.com 透過 API PATCH IML 的風險**取決於 IML 內容類型**，不是一刀切。
 
-**Why:** 2026-04-28 嘗試方案 B（API 新增 Module 15 「10b - Build Payment Button HTML」並用 Module 14 cross-ref）：
-- API PATCH HTTP 200，IML 長度 429 chars 寫回讀回一致（無 truncation）
-- Replay 13 ops 完成（多出 Module 15 的 1 op）
-- 但實際 email 渲染 HTML 卡片只剩字串尾段「`'style='...'>前往繳費`」，前段 div + reference 解析全失
-- 推測：UI 拖拉的 token 帶 hidden metadata（屬性 token type、source module、bundle index 等），純文字寫入相同字串形似但執行時 reference 無法 resolve
+| 內容類型 | API PATCH 安全嗎 | 範例 |
+|---|---|---|
+| 純 IML 函式、無 reference token | ✅ 安全 | Module 9 period 公式 `{{if(now <= parseDate(8.\`3\`; "YYYY-MM-DD"); "early_bird"; "normal")}}` |
+| 字面字串 + 同模組 / iterator-output reference（如 `{{5.label}}`、`{{10.selected_price}}`）| ✅ 安全（5/1 Issue #1 已驗證）| Module 27 HTML 模板含 `{{replace(replace(5.label; ...; ""))}} + {{10.selected_price}} + {{10.payment_link}}` |
+| 補完既有 IML 字串（如缺 `""` 引數）| ✅ 安全 | Issue #12 補 Module 11 dealname `""` |
+| **跨模組「token 拼接」**（用某 module 的變數 + 字串 + 另一 module 的變數，兩個都是引用其他 SetVariables 的命名變數）| ❌ **仍須 UI 拖拉** | 4/28 慘案：Module 15 SetVariables 用 `<div>` + `{{14.x}}` + `<style>` + `{{14.y}}` |
 
-緊急回退：`/api/v2/scenarios/{id}/blueprints?blueprintId=<n>` 可抓任何歷史版本，PATCH 還原。已記錄此 endpoint。
+**Why H2 確定（5/1 Issue #12 review）**：原本「API 寫 reference token 必失敗」的判斷被 Issue #1 (Module 27 用 API PATCH 成功) 與 Issue #12（H2 確定）證明過於保守。差別在於：
 
-**How to apply:**
-- 修改 Make scenario 涉及 reference token 的 IML（特別是 SetVariables 內的長字串拼接）→ 一律用 Make Editor UI 操作
-- 純 string / 純 IML 函式（無 reference）的 IML 可用 API（如 Module 9 period 公式 `{{if(now <= parseDate(8.\`3\`; "YYYY-MM-DD"); "early_bird"; "normal")}}` 已驗證 OK）
-- 緊急回退用 `?blueprintId=<n>` endpoint，可從 `/blueprints?teamId=...` 列表找到歷史版本號
-- 動 IML 前，務必先讀 `project_make_v51_debug_state.md` memory 中的「IML 隱藏 syntax 知識」段落
+- 4/28 慘案的 reference 是「**已存在於另一個 SetVariables 模組**」的 token（cross-module token assembly）
+- Issue #1 / Issue #12 的 reference 是「**iterator output 的欄位**」（`{{5.label}}`）或「**同模組產生的變數**」（`{{10.selected_price}}`）
+
+後者 Make 的執行階段 reference resolution 不依賴 UI 拖拉的 hidden metadata；前者似乎依賴。
+
+**How to apply（細化規則）**：
+1. **可放心 API PATCH 的情境**：
+   - 純 IML 函式 / 字面字串
+   - `{{moduleId.fieldName}}` 形式的 iterator output 引用（如 `5.label`、`5.value`）
+   - 同 module 內 SetVariables 之間的 reference（Issue #1 Module 10 → Module 27 的 `{{10.selected_price}}` 屬此類，已驗證 OK）
+2. **仍須 UI 拖拉**：跨多個 SetVariables 模組的「token 拼接」式 reference（極少見、需具體判斷）
+3. **保險做法**：API PATCH 後務必（a）GET 一次 blueprint 確認字串完整、（b）Run Once + 看下游 production 真實輸出（不是只看 ops 數）— 詳見 `feedback_acceptance_test_downstream_refs.md`
+4. **緊急回退** `/api/v2/scenarios/{id}/blueprints?blueprintId=<n>` 可抓任何歷史版本 PATCH 還原
+5. **Lint 規則**：API PATCH 腳本對 IML 字串組裝時 lint `replace(...;...;)`、`if(...;...; )` 等缺引數模式（詳見 `feedback_make_iml_replace_empty_args.md`）

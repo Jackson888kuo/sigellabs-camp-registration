@@ -1,0 +1,52 @@
+# GitHub Pages Jekyll 設定
+# 參考：https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll
+
+title: 太陽實驗室 Sigel Labs 團報自動化系統
+description: 開發紀錄、業務同事使用手冊、SOP、整合測試計畫
+url: "https://jackson888kuo.github.io"
+baseurl: "/sigellabs-camp-registration"
+
+# 主題（GitHub Pages 內建支援）
+theme: jekyll-theme-cayman
+
+# Markdown 處理器
+markdown: kramdown
+kramdown:
+  input: GFM  # GitHub Flavored Markdown（支援表格、emoji、刪除線）
+
+# 啟用 GitHub Pages 預設 plugins（讓 README.md 自動成為索引頁）
+plugins:
+  - jekyll-relative-links
+  - jekyll-readme-index
+  - jekyll-optional-front-matter
+  - jekyll-default-layout
+  - jekyll-titles-from-headings
+
+# 關鍵設定：讓相對連結（.md）自動轉為 .html
+relative_links:
+  enabled: true
+  collections: true
+
+# 關鍵設定：README.md 自動成為該資料夾的索引頁
+readme_index:
+  enabled: true
+  remove_originals: false
+  with_frontmatter: true
+
+# 包含子資料夾
+include:
+  - manuals
+  - runbooks
+  - sprints
+  - issues
+  - snapshots
+  - bugs
+  - handoff
+
+# 排除不必要檔案（避免污染輸出）
+exclude:
+  - "*.json"
+  - "*.gs"
+  - Gemfile
+  - Gemfile.lock
+  - vendor

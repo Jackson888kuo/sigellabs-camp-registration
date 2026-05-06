@@ -1,10 +1,10 @@
 ---
-name: Make scenario 4596472 模組精確 mapper 路徑（v11 post-Issue-3）
-description: scenario 4596472 v11 blueprint（Issue #3 完成後）Module 5/8/9/10/11/13/14/27/28 的精確 mapper.* 路徑與當前 IML 值
+name: Make scenario 4596472 模組精確 mapper 路徑（v12 post-Issue-8）
+description: scenario 4596472 v12 blueprint（Issue #8 完成後）Module 5/8/9/10/11/13/14/27/28 的精確 mapper.* 路徑與當前 IML 值；Module 13 mapper.values 現為 7 個 key（已移除 J 欄 "9"）
 type: reference
 originSessionId: 67676285-33e0-4f19-acbf-6fe2f171f546
 ---
-從 `docs/snapshots/blueprint_v11_post_issue3_final.json`（5/6 匯出）解析得到。後續若改動 IML 可參照此表確認下手點。
+從 `docs/snapshots/blueprint_v12_post_issue8.json`（5/6 匯出）解析得到。後續若改動 IML 可參照此表確認下手點。
 
 ## 14 個 Module 完整列表（Issue #3 新增 Module 28）
 
@@ -55,6 +55,22 @@ originSessionId: 67676285-33e0-4f19-acbf-6fe2f171f546
 ⚠️ **Module 11 dealname 分隔符號是 ASCII ` x `（空格 + 0x78 + 空格），不是乘號 `× `**。Issue #6 v2 spec §3.3 / §7 / §11 寫成「× {{5.value}}」是 spec 撰寫時的錯誤。實際 blueprint hex bytes：`7d7d 2078 20`（即 `}}` + 空格 + `x` + 空格）。
 
 ⚠️ **edge filter 路徑 `flow[i].filter` 與 mapper filter 路徑 `flow[i].mapper.filter` 完全不同**，極易混淆。詳見 `feedback_make_blueprint_filter_paths.md`。
+
+## Module 13 mapper.values（v12 post-Issue-8）
+
+Issue #8（5/6 完成）移除了 key `"9"`，現在只剩 **7 個 key（"0"–"6"）**：
+
+| key | Sheets 欄 | 內容 |
+|---|---|---|
+| "0" | A 提交時間 | `{{formatDate(1.createdAt; "YYYY-MM-DD HH:mm:ss"; "Asia/Taipei")}}` |
+| "1" | B 家長姓名 | `{{get(map(...; "家長姓名"); 1)}}` |
+| "2" | C Email | `{{get(map(...; "Email"); 1)}}` |
+| "3" | D 電話 | `{{get(map(...; "電話"); 1)}}` |
+| "4" | E 孩子姓名 | `{{get(map(...; "孩子姓名"); 1)}}` |
+| "5" | F 報名營隊 | `{{replace(replace(5.label; "孩子要報名哪些營隊？ ("; ""); ")"; "")}}` |
+| "6" | G 付款狀態 | `未付款` |
+
+> keys "7"（H 付款時間）、"8"（I 備註）原本就不存在，google-sheets:addRow 自動補空白。key "9"（J debug 欄）已於 Issue #8 刪除。
 
 ## ops 公式
 

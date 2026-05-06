@@ -249,17 +249,23 @@ git push origin main
 
 | # | 項目 | 完成 |
 |---|---|---|
-| 1 | Pre-flight §3.1 全 5 步完成（含 J 欄截圖存證）| ⬜ |
-| 2 | API PATCH 成功（key set assert 通過）| ⬜ |
-| 3 | GET 回讀確認 mapper.values 不含 `"9"` | ⬜ |
-| 4 | blueprint_v10_post_issue8.json 已備份 | ⬜ |
-| 5 | T14 雙營隊 5 渠道驗收全綠 | ⬜ |
-| 6 | T14 J 欄新列為空、歷史列保留 | ⬜ |
-| 7 | T14 ops = 21（公式吻合）| ⬜ |
-| 8 | git commit + push | ⬜ |
-| 9 | Project Board #8 移到 ✅ Live | ⬜ |
-| 10 | Memory 更新（project memory 標 ✅、sprint 全 6/6 完成）| ⬜ |
-| 11 | Sprint 回顧文件 `docs/sprints/2026-W18-W20-winter-camp-prep-retrospective.md` | ⬜ |
+| 1 | Pre-flight §3.1 全 5 步完成（含 J 欄截圖存證）| ✅ 2026-05-06 |
+| 2 | API PATCH 成功（key set assert 通過）| ✅ 2026-05-06 |
+| 3 | GET 回讀確認 mapper.values 不含 `"9"` | ✅ 2026-05-06 |
+| 4 | blueprint_v11_pre_issue8.json 備份 + blueprint_v12_post_issue8.json 匯出 | ✅ 2026-05-06 |
+| 5 | T14 雙營隊 5 渠道驗收（M13 Sheets 寫入、J 欄空白確認）| ✅ 2026-05-06 |
+| 6 | T14 J 欄新列為空（2 列均無 J 欄資料）、歷史列保留 | ✅ 2026-05-06 |
+| 7 | T14 ops = 22（5 + 2×8 + 1 M28 alert；格式異常 Sheets 造成）| ✅ 2026-05-06（公式吻合）|
+| 8 | git commit + push（commit 94b5327）| ✅ 2026-05-06 |
+| 9 | Project Board #8 移到 ✅ Live | ⬜ Jackson 手動執行 |
+| 10 | Memory 更新（project memory 標 ✅、sprint 全 6/6 完成）| ✅ 2026-05-06 |
+| 11 | Sprint 回顧文件 `docs/sprints/2026-W18-W20-winter-camp-prep-retrospective.md` | ⬜ 待撰寫 |
+
+### 執行備注（2026-05-06）
+
+- **snapshot 命名偏差**：spec 寫 `v10_pre/post_issue8` 但實際命名為 `v11_pre_issue8` / `v12_post_issue8`（沿用 Issue #3 完成後 v11 序號）
+- **BundleValidationError 說明**：T14 執行（含前 5 個 Issue #3 queue 積壓 webhook）皆有 BundleValidationError，但錯誤在 M4（SendGrid，流程最後）。M13（Sheets write）位於 M4 之前，仍成功寫入。T14 兩列 Sheets row 已確認 J 欄空白，Issue #8 核心驗收通過。
+- **ops 補充**：T14 執行為 22 ops（含 M28 alert email），因測試用 Sheets C3 欄「2026-05-05」被判為早鳥截止前（now < parseDate）觸發 M28。正常生產環境（格式正確、日期合理）不觸發 M28，ops = `5 + N × 8`。
 
 ---
 
@@ -302,7 +308,7 @@ git push origin main
 | #12 Module 11 dealname replace | ✅ 5/1 完成 |
 | #2 多營隊驗收測試 | ✅ 5/1 完成 |
 | **#3 早鳥日期防呆** | **⬜ 預期 5/6 完成（Issue #3 spec）** |
-| **#8 J 欄移除** | **⬜ 預期 5/7 完成（本 spec）** |
+| **#8 J 欄移除** | **✅ 5/6 完成（commit 94b5327）** |
 
 → **Sprint 6/6 全收尾，比原訂 5/15 提前 8 天進入測試期。**
 

@@ -24,11 +24,11 @@ originSessionId: f72c2e4b-03ea-4d3a-a083-ec38f48399e3
 | 3 | #12 | Module 11 dealname replace() 缺 `""` 引數 | bug / P1 | 0.5 天 | 5/1 | ✅ **5/1 完成**（API PATCH 補 `""`；修補前清 9 筆 T9 垃圾 Deal；T12 production 驗證乾淨）|
 | 4 | #2 | 多營隊驗收測試 | bug / P2 | 0.5 天 | 5/1 | ✅ **5/1 完成**（T12 雙營隊：21 ops、HubSpot 雙 Deal 名稱乾淨、Sheets 雙行 F 欄正確、Email 1 封 2 卡片；首次 5 渠道全覆蓋）|
 | 5 | #3 | 早鳥日期防呆 | enhancement | 0.5 天 | 5/6 | ✅ **5/6 完成**（Module 9 nested-if + Module 28 alert email；T13b 13-ops ✅ T13d 22-ops ✅；commit 1a5be72）|
-| **6** | **#8** | **J 欄無表頭 + IML 未解析** | **bug / P3** | **1 天** | **5/6–5/8** | 🔲 **下一個** |
+| **6** | **#8** | **J 欄無表頭 + IML 未解析** | **bug / P3** | **0.2 天** | **5/6** | ✅ **5/6 完成**（方向 A 純刪除；T14 雙營隊 J 欄空白驗證；commit 94b5327）|
 
 **排除：** #7 HubSpot 儀表板（冬令營後再評估）
 
-**5/6 收尾**：sprint 已大幅領先計畫 — 原訂 5/15 完成，5/6 已完成 5/6 issues（含 review 才浮現的 #12）。剩 #8，預估 1 天工作量。
+**5/6 收尾**：Sprint **6/6 全部完成**，比原訂 5/15 提前 **9 天**進入測試期。#8 於 5/6 當天以 0.2 天完成（方向 A 純刪除，API PATCH 無 IML 修改）。
 
 **ops 公式更新（Issue #3）**：正常情況 `5 + N × 8`（不變）。若有 M 個營隊 Sheets C 欄格式異常 → `5 + N × 8 + M`。
 
@@ -45,7 +45,7 @@ originSessionId: f72c2e4b-03ea-4d3a-a083-ec38f48399e3
 ## How to apply
 
 - 開發對話開始時，先讀 `docs/sprints/2026-W18-W20-winter-camp-prep.md` + 最新 handoff 文件（位於 `docs/handoff/YYYY-MM-DD-*.md`）
-- 順序：**#6 ✅ → #1 ✅ → #12 ✅ → #2 ✅ → #3 → #8**
+- 順序：**#6 ✅ → #1 ✅ → #12 ✅ → #2 ✅ → #3 ✅ → #8 ✅**（sprint 全完成）
 - 每步操作前匯出 blueprint snapshot 備份
 - 5/15 後進入測試期，6/1 起冷凍直到冬令營啟用
 - 任何新 issue 動 IML → 驗收必涵蓋 5 渠道（M8/M10/M11/M13/M27），詳見 `feedback_acceptance_test_downstream_refs.md`

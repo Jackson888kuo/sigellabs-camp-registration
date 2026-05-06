@@ -24,6 +24,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Staging 環境配置 — 含 webhook URL，絕不可推
+docs/runbooks/staging-credentials.md
+
 # 暫存
 *.tmp
 *.bak

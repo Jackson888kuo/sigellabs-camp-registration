@@ -1,12 +1,12 @@
 ---
-name: Make scenario 4596472 模組精確 mapper 路徑（v7 post-Issue-1）
-description: scenario 4596472 v7 blueprint（Issue #6 + #1 完成後）Module 5/8/10/11/13/14/27 的精確 mapper.* 路徑與當前 IML 值
+name: Make scenario 4596472 模組精確 mapper 路徑（v11 post-Issue-3）
+description: scenario 4596472 v11 blueprint（Issue #3 完成後）Module 5/8/9/10/11/13/14/27/28 的精確 mapper.* 路徑與當前 IML 值
 type: reference
 originSessionId: 67676285-33e0-4f19-acbf-6fe2f171f546
 ---
-從 `docs/snapshots/blueprint_v7_post_issue1_fix.json`（5/1 凌晨匯出）解析得到。後續若改動 IML 可參照此表確認下手點。
+從 `docs/snapshots/blueprint_v11_post_issue3_final.json`（5/6 匯出）解析得到。後續若改動 IML 可參照此表確認下手點。
 
-## 13 個 Module 完整列表（Issue #1 新增 Module 27）
+## 14 個 Module 完整列表（Issue #3 新增 Module 28）
 
 | ID | type | 用途 |
 |---|---|---|
@@ -21,10 +21,21 @@ originSessionId: 67676285-33e0-4f19-acbf-6fe2f171f546
 | 11 | hubspotcrm:createDeal | 一營隊一 Deal |
 | 12 | hubspotcrm:CreateAssociation | Deal ↔ Contact 關聯 |
 | 13 | google-sheets:addRow | 寫入報名追蹤表 |
+| **28** | **sendgrid:sendMail** | **早鳥截止日格式異常 alert email（Issue #3 新增）；位置 M13 後 M14 前；filter: `9.period_alert ≠ ""`** |
 | 14 | builtin:BasicAggregator | 收尾合併（payment_button_html 引用 27.x）|
 | 4 | sendgrid:sendMail | 寄繳費卡片 email |
 
-## 6 處 5.label / iterator-output reference 精確位置（v7 post-Issue-1）
+## Module 9 IML（v11 post-Issue-3）
+
+| 變數 | IML |
+|---|---|
+| `period` | `{{if(length(8.\`3\`) = 10; if(substring(8.\`3\`; 4; 1) = "-"; if(substring(8.\`3\`; 7; 1) = "-"; if(now <= parseDate(8.\`3\`; "YYYY-MM-DD"); "early_bird"; "normal"); "normal"); "normal"); "normal")}}` |
+| `period_alert` | `{{if(length(8.\`3\`) = 10; if(substring(8.\`3\`; 4; 1) = "-"; if(substring(8.\`3\`; 7; 1) = "-"; ""; "MALFORMED_EARLY_BIRD_DATE"); "MALFORMED_EARLY_BIRD_DATE"); "")}}` |
+| `parent_email` | `{{get(map(1.data.fields; "value"; "label"; "Email"); 1)}}` |
+
+> ⚠️ `parseDate` 在 Make IML 對非法日期 **throw error**（非 null），故必須用 length+substring 預先驗證格式再呼叫。詳見 memory `feedback_make_iml_parsedate_throws.md`。
+
+## 6 處 5.label / iterator-output reference 精確位置（v11 post-Issue-3）
 
 | Module | mapper 路徑 | 當前值（v7）| 狀態 |
 |---|---|---|---|
@@ -49,9 +60,15 @@ originSessionId: 67676285-33e0-4f19-acbf-6fe2f171f546
 
 `5 + N × 8`（N = Tally 勾選營隊數，N ≥ 2）。Issue #6 完成時為 `5 + N × 7`，Issue #1 新增 Module 27 後 +1 ops/迭代。
 
+Issue #3 新增 Module 28（alert email）但有 filter，正常情況不觸發：
+- 正常（8.`3` 格式正確）：`5 + N × 8`（不變）
+- M 個營隊格式異常：`5 + N × 8 + M`（M ≤ N）
+
 ## How to apply
 
 - 任何要改 5.label 衍生的工作，照此表確認 `mapper.路徑` 後再下手
 - Module 13 改 values 時注意 key 是字串 `"5"` 不是整數 `5`
 - 改 Module 11 dealname 時保留 ` x ` 字面字串、不要誤改成 `× `；補 `""` 第三引數時其他四處（M8/M10/M13/M27）已正確、不要動
 - Issue #2 多營隊驗收測試：5 處下游渠道（M8/M10/M11/M13/M27）必須各別驗證（詳見 `feedback_acceptance_test_downstream_refs.md`）
+- Module 9 IML 呼叫 `parseDate` 前必須做格式預檢，不能直接用 `parseDate(8.3; ...)` 因為非法輸入會 throw error（詳見 `feedback_make_iml_parsedate_throws.md`）
+- Make IML 無 `and()`/`or()`/`not()` — 多條件必須巢狀 `if()`

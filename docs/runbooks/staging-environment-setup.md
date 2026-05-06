@@ -19,7 +19,7 @@
 | Make scenario | `4596472` | 主流程（v11 post-Issue-3）|
 | Make Team | `2085532` | 帳號 |
 | 活動設定表 Sheets | `1dZUNmS28HAuXLBPJchaB84xLlRAXuHeMIFxnIm__738` | 13 欄營隊配置 |
-| 報名追蹤表 Sheets | `1FGksYo2ghgeDLuH4VhwyT8wQM7QDBer7ieuQbjcFNqY` | Module 13 寫入目標 |
+| 團報報名追蹤表 Sheets | `1FGksYo2ghgeDLuH4VhwyT8wQM7QDBer7ieuQbjcFNqY` | Module 13 寫入目標 |
 | Tally 表單 | （production webhook URL 填入 Make Module 1）| 報名問卷 |
 | HubSpot Portal | （與 Make connection 綁定）| Contact + Deal |
 | SendGrid Sender | `hello@sigellabs.com` | Email 寄信 |
@@ -30,7 +30,7 @@
 |---|---|---|
 | Make scenario | `4596472-staging`（顯示名）；Make 自動配新 ID | scenario name 加 `-staging` 後綴 |
 | 活動設定表 Sheets | 新 ID（待生成）| Sheets 標題加 `_staging` 後綴 |
-| 報名追蹤表 Sheets | 新 ID（待生成）| 同上 |
+| 團報報名追蹤表 Sheets | 新 ID（待生成）| 同上 |
 | Tally 表單 | 新 ID（待生成）| 表單標題加 `[STAGING]` 前綴 |
 | HubSpot connection | 同 production（不另開 portal，加 deal 標籤區隔）| Deal 加自訂屬性 `environment=staging` |
 | SendGrid connection | 同 production（沿用 hello@sigellabs.com 寄出，但收件人改 jacksonkuo@gmail.com）| 寄信主旨加 `[STAGING]` 前綴 |
@@ -112,12 +112,12 @@
 | 3.4 | 紀錄新 spreadsheetId（從 URL 的 `/d/<ID>/edit` 取得）|
 | 3.5 | 確認新 Sheets 第 1 列表頭與原件一致（13 欄 A-M）|
 
-### 3.2 報名追蹤表
+### 3.2 團報報名追蹤表
 
 | # | 動作 |
 |---|---|
 | 3.6 | 開 https://docs.google.com/spreadsheets/d/1FGksYo2ghgeDLuH4VhwyT8wQM7QDBer7ieuQbjcFNqY |
-| 3.7 | 檔案 → 製作副本 → 命名 `報名追蹤表_v5_staging` |
+| 3.7 | 檔案 → 製作副本 → 命名 `團報報名追蹤表_v5_staging` |
 | 3.8 | **製作副本後手動刪除全部資料列**（保留第 1 列表頭 A-I）— Issue #8 修補後僅 9 欄、不需 J |
 | 3.9 | 紀錄新 spreadsheetId |
 
@@ -189,10 +189,10 @@
 | 5.2 | Make Editor 點 Run once | 進入等待 webhook 狀態 |
 | 5.3 | 用 staging Tally 表單送 1 筆測試報名（任選 §3.4 測試列 1 STEAM_TEST_NORMAL_FUTURE、3 人團報）| Tally 顯示送出成功 |
 | 5.4 | Make Editor 觀察 scenario 執行 | 13 ops 完整跑通 |
-| 5.5 | 開 staging 報名追蹤表 | 第 2 列出現 1 筆完整資料（J 欄空）|
+| 5.5 | 開 staging 團報報名追蹤表 | 第 2 列出現 1 筆完整資料（J 欄空）|
 | 5.6 | 開 HubSpot Portal | 1 筆 Contact + 1 筆 Deal（Deal name 含 STEAM_TEST_NORMAL_FUTURE）|
 | 5.7 | 開 jacksonkuo@gmail.com 信箱 | 收到 1 封確認信，內含付款卡片（早鳥金額）|
-| 5.8 | 開 production 報名追蹤表 | **完全沒有新增資料** ✅（隔離成功）|
+| 5.8 | 開 production 團報報名追蹤表 | **完全沒有新增資料** ✅（隔離成功）|
 
 ### 5.2 隔離驗證（最重要）
 
@@ -200,7 +200,7 @@
 |---|---|---|
 | 1 | Production scenario 未動 | Production Make Editor 顯示 enabled、無新 execution |
 | 2 | Production 活動設定表未動 | Sheets 內容與 staging 副本完全分離 |
-| 3 | Production 報名追蹤表未動 | 不出現 staging 測試資料 |
+| 3 | Production 團報報名追蹤表未動 | 不出現 staging 測試資料 |
 | 4 | Production Tally 未動 | 表單仍指向 production webhook |
 
 > 🚨 若隔離失敗（任一 production 元件被動到）→ **立即停用 staging scenario**，回頭排查 Step 3 spreadsheetId / Step 4 webhook URL。
@@ -223,7 +223,7 @@
 
 ## Sheets
 - 活動設定表 staging: https://docs.google.com/spreadsheets/d/<ID>
-- 報名追蹤表 staging: https://docs.google.com/spreadsheets/d/<ID>
+- 團報報名追蹤表 staging: https://docs.google.com/spreadsheets/d/<ID>
 
 ## Tally
 - 表單 ID: <填入>

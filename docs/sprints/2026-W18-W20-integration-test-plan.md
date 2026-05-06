@@ -151,7 +151,7 @@
 | M10 selected_price | 預期金額 | 10900 |
 | M10（實際）| Module Output | 10900 |
 | M11 dealname | HubSpot 抽查 | 王小明 x STEAM_TEST_NORMAL_FUTURE |
-| M13 Sheets 行 | 開 staging 報名追蹤表確認 | 第 5 行、A-I 完整、J 空 |
+| M13 Sheets 行 | 開 staging 團報報名追蹤表確認 | 第 5 行、A-I 完整、J 空 |
 | M27 payment_button_html | Email 抽查渲染 | 橘色卡片、金額 + 連結正確 |
 | Module 28 alert | 是否觸發 + 信件抽查 | 0（happy path）/ 1（fail-safe）|
 | 5 渠道綜合 | ✅ / ❌ | ✅ |

@@ -32,7 +32,7 @@
 | 您**要**管理 | 您**不要動** |
 |---|---|
 | Tally 表單的營隊選項 | Make.com scenario |
-| 活動設定表 Sheets 內容 | 報名追蹤表 Sheets（系統寫入用）|
+| 活動設定表 Sheets 內容 | 團報報名追蹤表 Sheets（系統寫入用）|
 | 處理 alert email | HubSpot Deal 結構 |
 
 ---

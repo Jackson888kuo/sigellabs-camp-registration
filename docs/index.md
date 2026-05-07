@@ -34,7 +34,7 @@ description: 開發紀錄、業務同事使用手冊、SOP、整合測試計畫
 |---|---|
 | [Issues](./issues/) | 已修補的 Issue 規格（#1, #3, #6, #8, #12 等）|
 | [Sprints](./sprints/) | Sprint 規劃、整合測試計畫、retrospective |
-| [Runbooks](./runbooks/) | Staging 環境建立 SOP |
+| [Runbooks](./runbooks/) | Staging 環境建立 SOP、冒煙測試報告 |
 | [Snapshots](./snapshots/) | Make blueprint 歷史備份（v6 ~ v12）|
 
 ---

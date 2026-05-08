@@ -128,6 +128,10 @@ function getGroupSize(form) {
 function validate(form) {
   const errors = [];
 
+  // honeypot：人類填表不會碰到這個欄位；有值 → 機器人送出
+  if (form.website?.value)
+    return [{ field: 'submit', msg: '系統偵測到異常提交，請重新整理頁面再試。' }];
+
   if (!form.parentName.value.trim())
     errors.push({ field: 'parentName', msg: '請填寫家長姓名' });
 
@@ -179,6 +183,8 @@ async function handleSubmit(e) {
 
   btn.disabled    = true;
   btn.textContent = '送出中…';
+  btn.classList.add('submit-btn--loading');
+  form.setAttribute('aria-busy', 'true');
 
   const payload = buildPayload({
     parentName:  form.parentName.value.trim(),
@@ -206,6 +212,8 @@ async function handleSubmit(e) {
     if (errEl) errEl.textContent = '系統暫時忙碌，請稍後再試或聯繫 hello@sigellabs.com';
     btn.disabled    = false;
     btn.textContent = '送出報名';
+    btn.classList.remove('submit-btn--loading');
+    form.setAttribute('aria-busy', 'false');
     console.error('handleSubmit:', err);
   }
 }

@@ -4,18 +4,20 @@
 :root {
   --color-primary:   #FF6A00;
   --color-primary-h: #E55A00;
+  --color-primary-bg:#fff7f2;
   --color-text:      #1a1a1a;
   --color-muted:     #6b7280;
   --color-border:    #d1d5db;
   --color-border-f:  #FF6A00;
   --color-error:     #dc2626;
-  --color-bg:        #f9fafb;
+  --color-bg:        #f3f4f6;
   --color-surface:   #ffffff;
   --radius-sm:       6px;
   --radius-md:       8px;
   --radius-lg:       12px;
   --shadow-sm:       0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
   --shadow-md:       0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  --shadow-card:     0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.07);
 }
 
 html { font-size: 16px; }
@@ -31,14 +33,38 @@ body {
 
 /* ── Layout ──────────────────────────────────────────────────────────────── */
 .page-wrapper {
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 40px 24px 80px;
+  padding: 48px 24px 80px;
+}
+
+/* ── Form Card（桌機用白卡片）────────────────────────────────────────────── */
+.form-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+@media (min-width: 641px) {
+  .form-card {
+    padding: 40px 48px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(0,0,0,.05);
+  }
+}
+
+/* ── Honeypot（防垃圾送出）──────────────────────────────────────────────── */
+.field-honeypot {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  pointer-events: none;
+  tab-size: 0;
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .form-header {
-  margin-bottom: 40px;
+  margin-bottom: 32px;
+  padding: 0 4px;
 }
 
 .brand {
@@ -157,6 +183,11 @@ body {
 .camp-item:hover {
   border-color: var(--color-primary);
   box-shadow: var(--shadow-sm);
+}
+
+.camp-item:has(input[type="checkbox"]:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
 }
 
 .camp-item input[type="checkbox"] {
@@ -309,6 +340,11 @@ body {
   font-weight: 500;
 }
 
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Submit ──────────────────────────────────────────────────────────────── */
 .submit-section {
   margin-top: 32px;
@@ -353,6 +389,25 @@ body {
 .submit-btn:disabled {
   opacity: .65;
   cursor: not-allowed;
+}
+
+.submit-btn--loading {
+  position: relative;
+  color: rgba(255,255,255,.2) !important;
+  pointer-events: none;
+}
+
+.submit-btn--loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .65s linear infinite;
 }
 
 /* ── Success View ────────────────────────────────────────────────────────── */
@@ -408,11 +463,31 @@ body {
 /* ── Mobile ──────────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .page-wrapper {
-    padding: 24px 16px 60px;
+    padding: 24px 0 60px;
+  }
+
+  .form-header {
+    padding: 0 16px;
+  }
+
+  .form-footer {
+    padding: 0 16px;
+  }
+
+  .form-card {
+    border-radius: 0;
+    padding: 24px 16px;
   }
 
   .form-title {
     font-size: 1.375rem;
+  }
+
+  /* 避免 iOS Safari 在 focus 時自動縮放（font-size < 16px 才會觸發）*/
+  .field-input,
+  select,
+  textarea {
+    font-size: 1rem;
   }
 
   .radio-group {

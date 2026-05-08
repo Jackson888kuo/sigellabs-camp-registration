@@ -19,7 +19,8 @@
 
     <!-- 主表單區 -->
     <main id="form-view">
-      <form id="registration-form" novalidate>
+      <div class="form-card">
+      <form id="registration-form" novalidate aria-busy="false">
 
         <!-- 家長姓名 -->
         <div class="field-group" id="group-parentName">
@@ -92,7 +93,14 @@
           <button type="submit" id="submit-btn" class="submit-btn">送出報名</button>
         </div>
 
+        <!-- honeypot：必須留空；機器人會填，人類不會看到 -->
+        <div class="field-honeypot" aria-hidden="true">
+          <label>Website</label>
+          <input type="text" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
       </form>
+      </div><!-- /.form-card -->
     </main>
 
     <!-- 送出成功畫面 -->

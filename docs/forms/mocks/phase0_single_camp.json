@@ -1,0 +1,63 @@
+{
+  "eventId": "evt_3e237c8e07584d7b",
+  "eventType": "FORM_RESPONSE",
+  "createdAt": "2026-05-08T07:21:53.499Z",
+  "data": {
+    "responseId": "phase0-resp-d0005d9c",
+    "submissionId": "phase0-resp-d0005d9c",
+    "respondentId": "phase0-respondent-6e882f94",
+    "formId": "self-hosted-form-v1",
+    "formName": "[STAGING] 太陽實驗室團報報名（自建表單）",
+    "createdAt": "2026-05-08T07:21:53.499Z",
+    "fields": [
+      {
+        "key": "question_8f78c0ce99d5",
+        "label": "家長姓名",
+        "type": "INPUT_TEXT",
+        "value": "Phase0_1camp_家長"
+      },
+      {
+        "key": "question_caf09aa056e2",
+        "label": "電話",
+        "type": "INPUT_PHONE_NUMBER",
+        "value": "+886912000099"
+      },
+      {
+        "key": "question_49c3b514138c",
+        "label": "Email",
+        "type": "INPUT_EMAIL",
+        "value": "jacksonkuo@gmail.com"
+      },
+      {
+        "key": "question_18af9a84d523",
+        "label": "孩子姓名",
+        "type": "INPUT_TEXT",
+        "value": "Phase0_1camp_Child"
+      },
+      {
+        "key": "question_b0ec88b0ef53",
+        "label": "孩子姓名（英文）",
+        "type": "INPUT_TEXT",
+        "value": "Phase0_1camp_Child"
+      },
+      {
+        "key": "question_ac1dc99e9782",
+        "label": "您這次要報名幾個營隊？",
+        "type": "MULTIPLE_CHOICE",
+        "value": "1"
+      },
+      {
+        "key": "question_97c452c54cfc",
+        "label": "團報人數",
+        "type": "MULTIPLE_CHOICE",
+        "value": "3"
+      },
+      {
+        "key": "question_bc56ed50a310",
+        "label": "孩子要報名哪些營隊？ ([STEAM_TEST_NORMAL_FUTURE])",
+        "type": "CHECKBOXES",
+        "value": "true"
+      }
+    ]
+  }
+}

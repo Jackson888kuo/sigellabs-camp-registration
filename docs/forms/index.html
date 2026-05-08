@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>太陽實驗室 2026 夏令營 — 團報報名</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="form-header">
+      <div class="brand">太陽實驗室 Sigel Labs</div>
+      <h1 class="form-title">2026 夏令營 團報報名</h1>
+      <p class="form-subtitle">填寫完畢後，我們將在 5 分鐘內寄送繳費連結至您的 Email。</p>
+    </header>
+
+    <!-- 主表單區 -->
+    <main id="form-view">
+      <div class="form-card">
+      <form id="registration-form" novalidate aria-busy="false">
+
+        <!-- 家長姓名 -->
+        <div class="field-group" id="group-parentName">
+          <label class="field-label" for="parentName">家長姓名 <span class="required">*</span></label>
+          <input type="text" id="parentName" name="parentName" class="field-input"
+                 autocomplete="name" placeholder="例：王大明"
+                 autocapitalize="words" spellcheck="false" enterkeyhint="next">
+          <span class="field-error" id="err-parentName"></span>
+        </div>
+
+        <!-- Email -->
+        <div class="field-group" id="group-email">
+          <label class="field-label" for="email">Email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" class="field-input"
+                 autocomplete="email" inputmode="email" placeholder="例：parent@example.com"
+                 autocapitalize="none" spellcheck="false" enterkeyhint="next">
+          <span class="field-error" id="err-email"></span>
+        </div>
+
+        <!-- 電話 -->
+        <div class="field-group" id="group-phone">
+          <label class="field-label" for="phone">電話 <span class="required">*</span></label>
+          <input type="tel" id="phone" name="phone" class="field-input"
+                 autocomplete="tel" inputmode="tel" placeholder="例：0912-345-678"
+                 autocapitalize="none" spellcheck="false" enterkeyhint="next">
+          <span class="field-error" id="err-phone"></span>
+        </div>
+
+        <!-- 孩子姓名 -->
+        <div class="field-group" id="group-childName">
+          <label class="field-label" for="childName">孩子姓名 <span class="required">*</span></label>
+          <input type="text" id="childName" name="childName" class="field-input"
+                 autocomplete="off" placeholder="例：王小寶"
+                 autocapitalize="words" spellcheck="false" enterkeyhint="next">
+          <span class="field-error" id="err-childName"></span>
+        </div>
+
+        <!-- 孩子姓名（英文）— 選填 -->
+        <div class="field-group" id="group-childNameEn">
+          <label class="field-label" for="childNameEn">孩子姓名（英文）<span class="field-hint">選填</span></label>
+          <input type="text" id="childNameEn" name="childNameEn" class="field-input"
+                 autocomplete="off" placeholder="例：Xiao-Bao Wang"
+                 autocapitalize="words" spellcheck="false" enterkeyhint="next">
+        </div>
+
+        <!-- 孩子要報名哪些營隊？ -->
+        <div class="field-group" id="group-camps">
+          <label class="field-label">孩子要報名哪些營隊？ <span class="required">*</span></label>
+          <div id="camp-loading" class="camp-loading" aria-live="polite">載入營隊中…</div>
+          <div id="camp-list" class="camp-list" role="group" aria-label="營隊選項"></div>
+          <span class="field-error" id="err-camps"></span>
+        </div>
+
+        <!-- 團報人數 -->
+        <div class="field-group" id="group-groupSize">
+          <label class="field-label">團報人數 <span class="required">*</span></label>
+          <div class="radio-group" role="radiogroup" aria-label="團報人數">
+            <label class="radio-item">
+              <input type="radio" name="groupSize" value="3">
+              <span class="radio-mark"></span>
+              <span class="radio-label">3 人團報</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="groupSize" value="8">
+              <span class="radio-mark"></span>
+              <span class="radio-label">8 人團報</span>
+            </label>
+          </div>
+          <span class="field-error" id="err-groupSize"></span>
+        </div>
+
+        <!-- 送出 -->
+        <div class="submit-section">
+          <span class="field-error field-error--submit" id="err-submit"></span>
+          <button type="submit" id="submit-btn" class="submit-btn">送出報名</button>
+        </div>
+
+        <!-- honeypot：必須留空；機器人會填，人類不會看到 -->
+        <div class="field-honeypot" aria-hidden="true">
+          <label>Website</label>
+          <input type="text" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+      </form>
+      </div><!-- /.form-card -->
+    </main>
+
+    <!-- 送出成功畫面 -->
+    <div id="success-view" class="success-view" style="display:none" role="status" aria-live="polite">
+      <div class="success-icon">✓</div>
+      <h2 class="success-title">報名已收到！</h2>
+      <p class="success-body">我們將在 <strong>5 分鐘內</strong> 寄送繳費連結至您的 Email。<br>如未收到，請查看垃圾郵件或聯繫 hello@sigellabs.com。</p>
+    </div>
+
+    <footer class="form-footer">
+      <p>如有疑問請聯繫 <a href="mailto:hello@sigellabs.com">hello@sigellabs.com</a></p>
+    </footer>
+  </div>
+
+  <script src="form.js"></script>
+</body>
+</html>

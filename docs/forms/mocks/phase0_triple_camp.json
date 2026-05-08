@@ -1,0 +1,75 @@
+{
+  "eventId": "evt_05e51e431aca445c",
+  "eventType": "FORM_RESPONSE",
+  "createdAt": "2026-05-08T07:21:53.501Z",
+  "data": {
+    "responseId": "phase0-resp-7629e8ac",
+    "submissionId": "phase0-resp-7629e8ac",
+    "respondentId": "phase0-respondent-5825d76e",
+    "formId": "self-hosted-form-v1",
+    "formName": "[STAGING] 太陽實驗室團報報名（自建表單）",
+    "createdAt": "2026-05-08T07:21:53.501Z",
+    "fields": [
+      {
+        "key": "question_131d82016f2f",
+        "label": "家長姓名",
+        "type": "INPUT_TEXT",
+        "value": "Phase0_3camp_家長"
+      },
+      {
+        "key": "question_7e127f6d0bad",
+        "label": "電話",
+        "type": "INPUT_PHONE_NUMBER",
+        "value": "+886912000099"
+      },
+      {
+        "key": "question_24676be0107f",
+        "label": "Email",
+        "type": "INPUT_EMAIL",
+        "value": "jacksonkuo@gmail.com"
+      },
+      {
+        "key": "question_df73a8bb0871",
+        "label": "孩子姓名",
+        "type": "INPUT_TEXT",
+        "value": "Phase0_3camp_Child"
+      },
+      {
+        "key": "question_4bb3cc718475",
+        "label": "孩子姓名（英文）",
+        "type": "INPUT_TEXT",
+        "value": "Phase0_3camp_Child"
+      },
+      {
+        "key": "question_c04d7316d36d",
+        "label": "您這次要報名幾個營隊？",
+        "type": "MULTIPLE_CHOICE",
+        "value": "3"
+      },
+      {
+        "key": "question_0eb24b6ad930",
+        "label": "團報人數",
+        "type": "MULTIPLE_CHOICE",
+        "value": "3"
+      },
+      {
+        "key": "question_1edb886780ac",
+        "label": "孩子要報名哪些營隊？ ([STEAM_TEST_NORMAL_FUTURE])",
+        "type": "CHECKBOXES",
+        "value": "true"
+      },
+      {
+        "key": "question_d2c66dd39ffc",
+        "label": "孩子要報名哪些營隊？ ([STEAM_TEST_NORMAL_PAST])",
+        "type": "CHECKBOXES",
+        "value": "true"
+      },
+      {
+        "key": "question_997b81665600",
+        "label": "孩子要報名哪些營隊？ ([STEAM_TEST_NORMAL_FUTURE])",
+        "type": "CHECKBOXES",
+        "value": "true"
+      }
+    ]
+  }
+}

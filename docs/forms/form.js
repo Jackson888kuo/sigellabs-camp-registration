@@ -177,7 +177,16 @@ async function handleSubmit(e) {
         errEl.closest?.('.field-group')?.classList.add('has-error');
       }
     });
-    form.querySelector('.has-error input, .has-error textarea')?.focus();
+    // 找到第一個錯誤欄位 → focus + scrollIntoView（手機鍵盤遮住時仍能看到）
+    const firstError = form.querySelector('.has-error');
+    if (firstError) {
+      const input = firstError.querySelector('input, textarea');
+      if (input) {
+        input.focus();
+      } else {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
     return;
   }
 

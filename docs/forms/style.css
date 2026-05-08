@@ -1,5 +1,12 @@
 /* ── Reset & Base ─────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* 移除 iOS/Android tap 藍框 */
+}
+
+html {
+  scroll-behavior: smooth;
+}
 
 :root {
   --color-primary:   #FF6A00;
@@ -20,7 +27,7 @@
   --shadow-card:     0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.07);
 }
 
-html { font-size: 16px; }
+html { font-size: 16px; }  /* 固定 base：防止瀏覽器自動縮放導致 rem 跑偏 */
 
 body {
   margin: 0;
@@ -172,12 +179,15 @@ body {
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
+  min-height: 52px; /* 符合 WCAG 觸控最小尺寸 */
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   background: var(--color-surface);
   transition: border-color .15s, background .15s, box-shadow .15s;
   user-select: none;
+  touch-action: manipulation; /* 取消 300ms 延遲 */
+  -webkit-user-select: none;
 }
 
 .camp-item:hover {
@@ -280,12 +290,15 @@ body {
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
+  min-height: 52px; /* 符合 WCAG 觸控最小尺寸 */
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   background: var(--color-surface);
   transition: border-color .15s, background .15s;
   user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
   min-width: 120px;
 }
 
@@ -361,6 +374,7 @@ body {
   display: block;
   width: 100%;
   padding: 15px 24px;
+  min-height: 52px;
   background: var(--color-primary);
   color: #fff;
   border: none;
@@ -373,6 +387,7 @@ body {
   transition: background .15s, box-shadow .15s, transform .1s;
   -webkit-appearance: none;
   appearance: none;
+  touch-action: manipulation;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -490,6 +505,27 @@ body {
     font-size: 1rem;
   }
 
+  /* iOS Safari 內建 input 陰影清除 */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"] {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: var(--radius-md); /* iOS 清除 -webkit-appearance 後需明確指定 */
+  }
+
+  /* 行動版 camp item：加大內距讓手指更好點 */
+  .camp-item {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  /* 行動版 checkmark 放大 */
+  .checkmark {
+    width: 26px;
+    height: 26px;
+  }
+
   .radio-group {
     flex-direction: column;
   }
@@ -497,5 +533,11 @@ body {
   .radio-item {
     min-width: unset;
     width: 100%;
+  }
+
+  /* 行動版 submit 按鈕加大字體 */
+  .submit-btn {
+    font-size: 1.0625rem;
+    padding: 17px 24px;
   }
 }

@@ -3,13 +3,13 @@
 > **目的**：Cowork session 的 memory 系統與 Claude Code 的 memory 系統不互通。本目錄是 Cowork session 累積的關鍵 memory 檔案副本，讓 Claude Code 可用 Read 工具直接讀取。
 >
 > **首次建立**：2026-04-30（Issue #6 交接）
-> **最近更新**：2026-05-06（Issue #8 完成，sprint 6/6 全收尾；blueprint → v12）
+> **最近更新**：2026-05-08（T13a-d staging 驗收計畫 + Issue #13 Phase 0 提前啟動；Cowork session）
 > **來源**：Cowork space + Claude Code session
 > **同步策略**：本 bundle 為**單向快照**。日後若於 Cowork 對話中更新 memory，需手動重新匯出至此 bundle 才會反映。
 
 ---
 
-## 16 個檔案分類（5/6 v2 版本 — Sprint 全收尾）
+## 18 個檔案分類（5/8 v3 版本 — Issue #13 Phase 0 提前啟動）
 
 ### Feedback（必讀規則 / 教訓）
 
@@ -39,10 +39,24 @@
 
 | 檔案 | 重點 | 狀態 |
 |---|---|---|
-| [project_winter_camp_sprint.md](project_winter_camp_sprint.md) | Sprint W18-W20；順序 #6✅→#1✅→#12✅→#2✅→#3✅→**#8✅**；**Sprint 6/6 全收尾** | 🔄 **5/6 v2 更新**（#8 ✅，sprint 完成）|
+| [project_winter_camp_sprint.md](project_winter_camp_sprint.md) | Sprint W18-W20；順序 #6✅→#1✅→#12✅→#2✅→#3✅→**#8✅**；**Sprint 6/6 全收尾** | 🟢 不變（5/6 v2）|
 | [project_issue_1_payment_button_dynamic.md](project_issue_1_payment_button_dynamic.md) | Issue #1 ✅ 已完成（commit 65aa256）；新增 Module 27；採方案 A（API PATCH）非原 D | 🟢 不變 |
+| [project_staging_t13_acceptance.md](project_staging_t13_acceptance.md) | Issue #3 staging T13a-d 驗收計畫 + Email 渠道補測 + M28 alert 觸發；發現 staging M28 主旨/連結硬編碼 production refs（決定延後合併處理）| 🆕 **5/8 新增**（Cowork）|
+| [project_self_hosted_form_sprint.md](project_self_hosted_form_sprint.md) | **Issue #13** Self-Hosted Form Sprint（W20-W22）；5/8 提前啟動 Phase 0 Payload 相容性驗證；mock generator + 3 預設 JSON + 驗收 runbook 已備齊；含 8 個 Tally schema invariants（Phase 1 form.js 必須沿用）| 🆕 **5/8 新增**（Cowork）|
 
 ---
+
+## 5/8 主要變更摘要（T13a-d 補驗 + Issue #13 Phase 0 提前啟動）
+
+| 維度 | 5/6 v2（PM）| **5/8 v3（Cowork）** |
+|---|---|---|
+| 檔案數 | 16 + INDEX | **18 + INDEX**（新增 2 個 project memory）|
+| 新增 project memory | — | `project_staging_t13_acceptance.md`、`project_self_hosted_form_sprint.md` |
+| Sprint W18-W20 | 全收尾 ✅ | 同（待 T13 驗收 + 5/12-5/14 整合測試）|
+| **Sprint W20-W22 (Issue #13)** | 規劃中（5/16 起）| **Phase 0 提前 8 天啟動**（5/8 mock 已備齊、待 Jackson 執行 curl）|
+| Blueprint 版本 | v12（production）| 同 + staging blueprint v1（與 production v12 一致）|
+| 5/7 staging smoke test | — | ✅ 通過（核心 + 隔離）；🟡 M4 BundleValidationError、M28 alert 未觸發 → 5/8 撰寫 T13a-d 補驗計畫 |
+| 已知 staging-only 瑕疵 | — | M28 主旨寫死 `4596472`、body 連結指 production sheet（決定延後合併處理）|
 
 ## 5/6 主要變更摘要（Issue #3 + Issue #8 完成 — Sprint 全收尾）
 
@@ -74,20 +88,44 @@
 
 ---
 
-## 給 Claude Code 的閱讀順序建議（Sprint 後 / Staging 設置場景）
+## 給 Claude Code 的閱讀順序建議
 
-Sprint 全部完成。下一階段為 Staging 環境設置（clone scenario + Sheets）。
+依當前接手場景擇一閱讀路徑：
+
+### 場景 A：Issue #13 Self-Hosted Form Phase 1+（form.js 開發）
+
+> 觸發條件：Jackson 回報 Phase 0 5 渠道全綠 ✅、要求進入 Phase 1。
 
 | 順序 | 檔案 | 為什麼 |
 |---|---|---|
-| 1 | `project_winter_camp_sprint.md` | Sprint 全狀態（6/6 ✅）+ staging 計劃 |
-| 2 | `reference_make_blueprint_module_paths.md` | **v12** blueprint 架構（M13 J 欄已刪）|
+| 1 | `project_self_hosted_form_sprint.md` | **必讀**：Phase 0 已完成的內容、8 個 schema invariants、Phase 1 form.js 設計合約 |
+| 2 | `docs/issues/issue-9-self-hosted-form-spec.md` §4 | Phase 1 表單核心邏輯 spec（不在 memory bundle，需直接讀 spec）|
+| 3 | `docs/forms/mocks/generate_mock_payload.py` | 已驗證的 mock 生成器；form.js 直接 port `build_payload()` 函式即可 |
+| 4 | `reference_tally_form_checkboxes_structure.md` | Tally 真實 schema、`？` 後半形空格的關鍵細節 |
+| 5 | `reference_make_blueprint_module_paths.md` | v12 blueprint 架構（form.js 觸發的所有模組）|
+
+### 場景 B：T13a-d 驗收後撰寫報告 + 開立 staging M28 修補單
+
+> 觸發條件：Jackson 回報 T13a-d 4 子情境執行完畢、要求收尾。
+
+| 順序 | 檔案 | 為什麼 |
+|---|---|---|
+| 1 | `project_staging_t13_acceptance.md` | **必讀**：4 子情境設計、staging M28 已知瑕疵、方案 X 決策 |
+| 2 | `docs/runbooks/staging-t13-acceptance-plan-2026-05-08.md` §6 | 11 項驗收 checklist（用於報告草稿）|
+| 3 | `docs/issues/issue-3-implementation-spec.md` §10 | Issue #3 production 實作差異紀錄（與 spec 對照用）|
+| 4 | `feedback_acceptance_test_downstream_refs.md` | 5 渠道驗收方法論 |
+
+### 場景 C：通用 Issue 修復（如 v5.2 改善清單批次處理）
+
+| 順序 | 檔案 | 為什麼 |
+|---|---|---|
+| 1 | `project_winter_camp_sprint.md` | Sprint 全狀態 + 後續排程 |
+| 2 | `reference_make_blueprint_module_paths.md` | v12 blueprint 架構 |
 | 3 | `feedback_iml_lint_form_consistency.md` | 動 IML 前的 lint 守則 |
-| 4 | `feedback_acceptance_test_downstream_refs.md` | 驗收方法論 |
-| 5 | `feedback_make_iml_api_risk.md` | API PATCH 安全範圍 |
-| 6 | `feedback_make_iml_parsedate_throws.md` | Issue #3 教訓：parseDate 行為 |
-| 7 | `feedback_make_iml_no_and_or_not.md` | Issue #3 教訓：無 and/or/not |
+| 4 | `feedback_make_iml_api_risk.md` | API PATCH 安全範圍 |
+| 5 | `feedback_make_iml_parsedate_throws.md` | Issue #3 教訓：parseDate 行為 |
+| 6 | `feedback_make_iml_no_and_or_not.md` | Issue #3 教訓：無 and/or/not |
 
 ---
 
-*本 INDEX 由 Claude Code session 於 2026-05-06 更新（Issue #8 完成，Sprint 6/6 全收尾）。*
+*本 INDEX 由 Cowork session 於 2026-05-08 更新（T13a-d 驗收計畫 + Issue #13 Phase 0 提前啟動）。*

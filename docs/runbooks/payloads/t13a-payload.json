@@ -1,0 +1,22 @@
+{
+  "eventId": "t13a-acceptance-2026-05-08",
+  "eventType": "FORM_RESPONSE",
+  "createdAt": "2026-05-08T10:00:00.000Z",
+  "data": {
+    "responseId": "t13a-resp-001",
+    "respondentId": "t13a-respond-001",
+    "formId": "MeYEJ8-staging",
+    "formName": "[STAGING] 太陽實驗室團報報名",
+    "createdAt": "2026-05-08T10:00:00.000Z",
+    "fields": [
+      { "key": "f0_parent_name",     "label": "家長姓名",                   "type": "INPUT_TEXT",  "value": "T13a驗收家長" },
+      { "key": "f1_phone",           "label": "電話",                       "type": "INPUT_PHONE", "value": "+886912000099" },
+      { "key": "f2_email",           "label": "Email",                      "type": "INPUT_EMAIL", "value": "jacksonkuo@gmail.com" },
+      { "key": "f3_child_name",      "label": "孩子姓名",                   "type": "INPUT_TEXT",  "value": "T13aChild" },
+      { "key": "f4_child_en",        "label": "孩子姓名（英文）",           "type": "INPUT_TEXT",  "value": "T13aChild" },
+      { "key": "f5_count",           "label": "您這次要報名幾個營隊？",     "type": "MULTIPLE_CHOICE", "value": "1" },
+      { "key": "f6_group_size",      "label": "團報人數",                   "type": "MULTIPLE_CHOICE", "value": "3" },
+      { "key": "f7_camps_choice_1",  "label": "孩子要報名哪些營隊？ ([STEAM_TEST_NORMAL_FUTURE])", "type": "CHECKBOXES", "value": "true" }
+    ]
+  }
+}

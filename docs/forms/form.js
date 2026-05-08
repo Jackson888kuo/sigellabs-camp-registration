@@ -2,8 +2,8 @@
 
 // ── Config ───────────────────────────────────────────────────────────────────
 // Fill these in after Phase 3 (Apps Script deploy) and Phase 4 (webhook switch)
-const APPS_SCRIPT_URL = 'TODO_FILL_IN_PHASE_3'; // Apps Script Web App URL
-const WEBHOOK_URL     = 'TODO_FILL_IN_PHASE_4'; // Make webhook URL
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZUagiiaOJFDdESWNqR7E6b_BuZ0kFR5BE5nLy74RUDz67jQzA5gH874pcg8RTYD-7pA/exec'; // Apps Script Web App URL
+const WEBHOOK_URL     = 'https://hook.us2.make.com/pr7f73pkg7rm2dmwrw7eff3n4w6wqrvl'; // Make webhook URL
 
 // ── Payload helpers ──────────────────────────────────────────────────────────
 function randomHex(len) {
